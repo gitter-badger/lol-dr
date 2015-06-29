@@ -1,11 +1,9 @@
-package com.ouchadam.loldr;
+package com.ouchadam.ui;
 
 import android.app.Activity;
 import android.widget.Toast;
 
-import ouchadam.com.loldr.R;
-
-class MainActivityPresenter {
+public class MainActivityPresenter {
 
     public static MainActivityPresenter onCreate(Activity activity) {
         activity.setContentView(R.layout.activity_main);

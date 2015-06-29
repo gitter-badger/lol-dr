@@ -1,0 +1,26 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.ouchadam.auth">
+
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <application>
+
+    <activity android:name="com.ouchadam.auth.OauthRedirectActivity">
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+          android:host="com.ouchadam.kanto"
+          android:scheme="http" />
+
+      </intent-filter>
+
+    </activity>
+
+  </application>
+
+</manifest>
