@@ -1,4 +1,4 @@
 package com.ouchadam;
 
-public class Foo {
+public class Bar {
 }
