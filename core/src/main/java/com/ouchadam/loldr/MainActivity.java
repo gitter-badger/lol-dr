@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.ouchadam.auth.Foo;
 import com.ouchadam.ui.MainActivityPresenter;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private MainActivityPresenter mainActivityPresenter;
 
