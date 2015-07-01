@@ -1,15 +1,15 @@
 package com.ouchadam.auth;
 
-public class User {
+public class UserTokenRequest {
 
     private final Type type;
     private final String redirectUrl;
 
-    public static User anon() {
-        return new User(Type.ANON, "");
+    public static UserTokenRequest anon() {
+        return new UserTokenRequest(Type.ANON, "");
     }
 
-    public User(Type type, String redirectUrl) {
+    public UserTokenRequest(Type type, String redirectUrl) {
         this.type = type;
         this.redirectUrl = redirectUrl;
     }

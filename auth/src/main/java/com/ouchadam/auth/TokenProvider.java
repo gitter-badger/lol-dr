@@ -17,13 +17,13 @@ public class TokenProvider {
         this.foo = foo;
     }
 
-    public void getToken(User user, final Callback callback) {
+    public void getToken(UserTokenRequest userTokenRequest, final Callback callback) {
         if (storedTokenIsValid()) {
-            callback.onTokenAcquired(getStoredToken(user));
-        } else if (hasStoredToken(user)){
-            refreshToken(user, callback);
+            callback.onTokenAcquired(getStoredToken(userTokenRequest));
+        } else if (hasStoredToken(userTokenRequest)){
+            refreshToken(userTokenRequest, callback);
         } else {
-            requestNewToken(user, callback);
+            requestNewToken(userTokenRequest, callback);
         }
     }
 
@@ -31,19 +31,19 @@ public class TokenProvider {
         return false;
     }
 
-    private boolean hasStoredToken(User user) {
+    private boolean hasStoredToken(UserTokenRequest userTokenRequest) {
         return false;
     }
 
-    private void refreshToken(User user, Callback callback) {
+    private void refreshToken(UserTokenRequest userTokenRequest, Callback callback) {
 
     }
 
-    private void requestNewToken(User user, final Callback callback) {
-        if (User.Type.ANON == user.getType()) {
+    private void requestNewToken(UserTokenRequest userTokenRequest, final Callback callback) {
+        if (UserTokenRequest.Type.ANON == userTokenRequest.getType()) {
             foo.requestSignedOutToken(wrapCallback(callback));
         } else {
-            foo.requestToken(user.getCode(), wrapCallback(callback));
+            foo.requestToken(userTokenRequest.getCode(), wrapCallback(callback));
         }
     }
 
@@ -56,7 +56,7 @@ public class TokenProvider {
         };
     }
 
-    private Token getStoredToken(User user) {
+    private Token getStoredToken(UserTokenRequest userTokenRequest) {
         return null;
     }
 

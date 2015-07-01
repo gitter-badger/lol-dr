@@ -5,7 +5,7 @@
 
   <application>
 
-    <activity android:name="com.ouchadam.auth.OauthRedirectActivity">
+    <activity android:name=".OAuthRedirectActivity">
 
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
