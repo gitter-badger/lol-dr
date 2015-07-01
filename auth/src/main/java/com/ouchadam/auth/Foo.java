@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -31,7 +32,13 @@ public class Foo {
     public static final String REDIRECT_URI = "http://com.ouchadam.kanto";
     public static final String CLIENT_ID = "6224o4_ylYWflQ";
 
-    public void requestAuthentication(Activity activity) {
+    private final UUID uniqueDeviceId;
+
+    public Foo(UUID uniqueDeviceId) {
+        this.uniqueDeviceId = uniqueDeviceId;
+    }
+
+    public void requestUserAuthentication(Activity activity) {
         String responseType = "code";
         String requestId = "RANDOM_STRING";
         String duration = "temporary";
@@ -46,6 +53,42 @@ public class Foo {
                 + "&duration=" + duration
                 + "&scope=" + scope));
         activity.startActivity(intent);
+    }
+
+    public void requestSignedOutToken(Callback callback) {
+        Log.e("!!!", "requestSignedOutToken");
+
+        Observable.just("")
+                .map(getSignedOutAccessToken())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(requestTokenFromApi(callback));
+    }
+
+    private Func1<Object, String> getSignedOutAccessToken() {
+        return new Func1<Object, String>() {
+            @Override
+            public String call(Object s) {
+                Log.e("!!!", "running");
+
+                try {
+                    MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
+                    Request request = new Request.Builder()
+                            .url("https://www.reddit.com/api/v1/access_token")
+                            .post(RequestBody.create(textMediaType, "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=" + uniqueDeviceId.toString()))
+                            .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
+                            .build();
+
+                    Response response = new OkHttpClient().newCall(request).execute();
+
+                    Log.e("!!!", "sending : " + request.urlString());
+
+                    return response.body().string();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
     }
 
     public void requestToken(String redirectUrl, Callback callback) {

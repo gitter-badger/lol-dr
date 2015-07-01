@@ -10,7 +10,7 @@ public class OauthRedirectActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new Foo().requestToken(getIntent().getData().toString(), new Foo.Callback() {
+        new Foo(uniqueDeviceId).requestToken(getIntent().getData().toString(), new Foo.Callback() {
             @Override
             public void onSuccess(Foo.Token token) {
                 Toast.makeText(OauthRedirectActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
