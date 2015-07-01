@@ -9,13 +9,12 @@ public class OauthRedirectActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        new Foo(uniqueDeviceId).requestToken(getIntent().getData().toString(), new Foo.Callback() {
+        String redirectUrl = getIntent().getData().toString();
+        TokenProvider.newInstance().getToken(new User(User.Type.SIGNED_IN, redirectUrl), new TokenProvider.Callback() {
             @Override
-            public void onSuccess(Foo.Token token) {
+            public void onTokenAcquired(Token token) {
                 Toast.makeText(OauthRedirectActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
             }
         });
-
     }
 }

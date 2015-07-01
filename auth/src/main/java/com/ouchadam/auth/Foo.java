@@ -26,7 +26,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class Foo {
+class Foo {
 
     public static final String BASE_URL = "https://www.reddit.com/api/v1/authorize.compact?client_id=";
     public static final String REDIRECT_URI = "http://com.ouchadam.kanto";
@@ -179,18 +179,6 @@ public class Foo {
 
     public interface Callback {
         void onSuccess(Token token);
-    }
-
-    public static class Token {
-        private final String urlResponse;
-
-        public Token(String urlResponse) {
-            this.urlResponse = urlResponse;
-        }
-
-        public String getUrlResponse() {
-            return urlResponse;
-        }
     }
 
 }
