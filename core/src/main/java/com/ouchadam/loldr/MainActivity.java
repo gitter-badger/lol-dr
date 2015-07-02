@@ -11,6 +11,10 @@ import com.ouchadam.auth.TokenProvider;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.ui.MainActivityPresenter;
 
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
 public class MainActivity extends AppCompatActivity {
 
     private MainActivityPresenter mainActivityPresenter;
@@ -32,7 +36,25 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onClickAnonToken() {
-            tokenProvider.getToken(UserTokenRequest.anon());
+            tokenProvider.getToken(UserTokenRequest.anon())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<Token>() {
+                @Override
+                public void onCompleted() {
+
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+
+                @Override
+                public void onNext(Token token) {
+                    Toast.makeText(MainActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
+                }
+            });
         }
     };
 

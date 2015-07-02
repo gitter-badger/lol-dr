@@ -4,6 +4,8 @@ import android.app.Activity;
 
 import java.util.UUID;
 
+import rx.Observable;
+
 public class TokenProvider {
 
     private final Foo foo;
@@ -17,7 +19,7 @@ public class TokenProvider {
         this.foo = foo;
     }
 
-    public Token getToken(UserTokenRequest userTokenRequest) {
+    public Observable<Token> getToken(UserTokenRequest userTokenRequest) {
         // TODO remove callback and become blocking
         if (storedTokenIsValid()) {
             return getStoredToken(userTokenRequest);
@@ -36,19 +38,19 @@ public class TokenProvider {
         return false;
     }
 
-    private Token refreshToken(UserTokenRequest userTokenRequest) {
+    private Observable<Token> refreshToken(UserTokenRequest userTokenRequest) {
         return null;
     }
 
-    private Token requestNewToken(UserTokenRequest userTokenRequest) {
+    private Observable<Token> requestNewToken(UserTokenRequest userTokenRequest) {
         if (UserTokenRequest.Type.ANON == userTokenRequest.getType()) {
-            return foo.requestAnonymousAccessToken().toBlocking().first();
+            return foo.requestAnonymousAccessToken();
         } else {
-            return foo.requestToken(userTokenRequest.getCode());
+            return foo.requestUserToken(userTokenRequest.getCode());
         }
     }
 
-    private Token getStoredToken(UserTokenRequest userTokenRequest) {
+    private Observable<Token> getStoredToken(UserTokenRequest userTokenRequest) {
         return null;
     }
 

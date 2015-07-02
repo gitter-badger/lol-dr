@@ -78,34 +78,30 @@ class Foo {
 
     private String getAnonymousAccessToken() throws IOException {
         Log.e("!!!", "running");
-            MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
-            Request request = new Request.Builder()
-                    .url("https://www.reddit.com/api/v1/access_token")
-                    .post(RequestBody.create(textMediaType, "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=" + uniqueDeviceId.toString()))
-                    .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
-                    .build();
+        MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
+        Request request = new Request.Builder()
+                .url("https://www.reddit.com/api/v1/access_token")
+                .post(RequestBody.create(textMediaType, "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=" + uniqueDeviceId.toString()))
+                .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
+                .build();
 
-            Response response = new OkHttpClient().newCall(request).execute();
+        Response response = new OkHttpClient().newCall(request).execute();
 
-            Log.e("!!!", "sending : " + request.urlString());
+        Log.e("!!!", "sending : " + request.urlString());
 
-            return response.body().string();
+        return response.body().string();
     }
 
-    public Token requestToken(String redirectUrl) {
-        return new Token(
-                Observable.just(redirectUrl)
-                        .map(getAccessToken())
-                        .toBlocking()
-                        .first()
-        );
+    public Observable<Token> requestUserToken(String redirectUrl) {
+        return Observable.just(redirectUrl)
+                .map(getAccessToken());
     }
 
-    private Func1<String, String> getAccessToken() {
-        return new Func1<String, String>() {
+    private Func1<String, Token> getAccessToken() {
+        return new Func1<String, Token>() {
             @Override
-            public String call(String s) {
-                Map<String, List<String>> queryParams = getQueryParams(s);
+            public Token call(String redirectUrl) {
+                Map<String, List<String>> queryParams = getQueryParams(redirectUrl);
 
                 try {
                     String code = queryParams.get("code").get(0);
@@ -123,7 +119,7 @@ class Foo {
                     Log.e("!!!", "sending : " + request.urlString());
                     Log.e("!!!", "code : " + code);
 
-                    return response.body().string();
+                    return new Token(response.body().string());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -131,7 +127,7 @@ class Foo {
         };
     }
 
-    public static Map<String, List<String>> getQueryParams(String url) {
+    private static Map<String, List<String>> getQueryParams(String url) {
         try {
             Map<String, List<String>> params = new HashMap<>();
             String[] urlParts = url.split("\\?");
@@ -157,30 +153,6 @@ class Foo {
         } catch (UnsupportedEncodingException ex) {
             throw new AssertionError(ex);
         }
-    }
-
-    private Subscriber<String> requestTokenFromApi(final Callback callback) {
-        return new Subscriber<String>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e("!!!", "error", e);
-            }
-
-            @Override
-            public void onNext(String url) {
-                Log.e("!!!", "Got a valid result! : " + url);
-                callback.onSuccess(new Token(url));
-            }
-        };
-    }
-
-    public interface Callback {
-        void onSuccess(Token token);
     }
 
 }

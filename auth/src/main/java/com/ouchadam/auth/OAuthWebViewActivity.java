@@ -7,9 +7,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Func1;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class OAuthWebViewActivity extends Activity {
 
@@ -43,33 +43,28 @@ public class OAuthWebViewActivity extends Activity {
 
     private void onRedirect(String redirectUrl) {
         UserTokenRequest userTokenRequest = new UserTokenRequest(UserTokenRequest.Type.SIGNED_IN, redirectUrl);
+        TokenProvider.newInstance().getToken(userTokenRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Token>() {
+                    @Override
+                    public void onCompleted() {
 
-        Observable.just(userTokenRequest)
-                .map(new Func1<UserTokenRequest, Token>() {
-                         @Override
-                         public Token call(UserTokenRequest userTokenRequest) {
-                             return TokenProvider.newInstance().getToken(userTokenRequest);
-                         }
-                     }
-                ).subscribe(new Subscriber<Token>() {
-            @Override
-            public void onCompleted() {
+                    }
 
-            }
+                    @Override
+                    public void onError(Throwable e) {
 
-            @Override
-            public void onError(Throwable e) {
+                    }
 
-            }
-
-            @Override
-            public void onNext(Token token) {
-                Intent data = new Intent();
-                data.putExtra("data", token.getUrlResponse());
-                setResult(RESULT_OK, data);
-                finish();
-            }
-        });
+                    @Override
+                    public void onNext(Token token) {
+                        Intent data = new Intent();
+                        data.putExtra("data", token.getUrlResponse());
+                        setResult(RESULT_OK, data);
+                        finish();
+                    }
+                });
     }
 
 }
