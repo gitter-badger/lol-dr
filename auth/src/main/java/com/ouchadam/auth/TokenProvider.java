@@ -42,7 +42,7 @@ public class TokenProvider {
 
     private Token requestNewToken(UserTokenRequest userTokenRequest) {
         if (UserTokenRequest.Type.ANON == userTokenRequest.getType()) {
-            return foo.requestSignedOutToken();
+            return foo.requestAnonymousAccessToken().toBlocking().first();
         } else {
             return foo.requestToken(userTokenRequest.getCode());
         }

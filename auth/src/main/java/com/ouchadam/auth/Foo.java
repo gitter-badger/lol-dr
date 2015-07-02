@@ -12,6 +12,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -43,56 +44,60 @@ class Foo {
         String scope = "read";
 
         Intent intent = new Intent(activity, OAuthWebViewActivity.class);
-        intent.setData(Uri.parse(BASE_URL
-                + CLIENT_ID
-                + "&response_type=" + responseType
-                + "&state=" + requestId
-                + "&redirect_uri=" + REDIRECT_URI
-                + "&duration=" + duration
-                + "&scope=" + scope));
+        intent.setData(
+                Uri.parse(
+                        BASE_URL
+                                + CLIENT_ID
+                                + "&response_type=" + responseType
+                                + "&state=" + requestId
+                                + "&redirect_uri=" + REDIRECT_URI
+                                + "&duration=" + duration
+                                + "&scope=" + scope));
 
         activity.startActivityForResult(intent, 100);
     }
 
-    public Token requestSignedOutToken() {
-        return new Token(Observable.just("")
-                .map(getSignedOutAccessToken())
-                .toBlocking()
-                .first()
+    public Observable<Token> requestAnonymousAccessToken() {
+        return Observable.create(
+                new Observable.OnSubscribe<Token>() {
+                    @Override
+                    public void call(Subscriber<? super Token> subscriber) {
+                        String anonymousAccessToken;
+                        try {
+                            anonymousAccessToken = getAnonymousAccessToken();
+                        } catch (IOException e) {
+                            subscriber.onError(e);
+                            return;
+                        }
+                        subscriber.onNext(new Token(anonymousAccessToken));
+                        subscriber.onCompleted();
+                    }
+                }
         );
     }
 
-    private Func1<Object, String> getSignedOutAccessToken() {
-        return new Func1<Object, String>() {
-            @Override
-            public String call(Object s) {
-                Log.e("!!!", "running");
+    private String getAnonymousAccessToken() throws IOException {
+        Log.e("!!!", "running");
+            MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
+            Request request = new Request.Builder()
+                    .url("https://www.reddit.com/api/v1/access_token")
+                    .post(RequestBody.create(textMediaType, "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=" + uniqueDeviceId.toString()))
+                    .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
+                    .build();
 
-                try {
-                    MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
-                    Request request = new Request.Builder()
-                            .url("https://www.reddit.com/api/v1/access_token")
-                            .post(RequestBody.create(textMediaType, "grant_type=https://oauth.reddit.com/grants/installed_client&device_id=" + uniqueDeviceId.toString()))
-                            .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
-                            .build();
+            Response response = new OkHttpClient().newCall(request).execute();
 
-                    Response response = new OkHttpClient().newCall(request).execute();
+            Log.e("!!!", "sending : " + request.urlString());
 
-                    Log.e("!!!", "sending : " + request.urlString());
-
-                    return response.body().string();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
+            return response.body().string();
     }
 
     public Token requestToken(String redirectUrl) {
-        return new Token(Observable.just(redirectUrl)
-                .map(getAccessToken())
-                .toBlocking()
-                .first()
+        return new Token(
+                Observable.just(redirectUrl)
+                        .map(getAccessToken())
+                        .toBlocking()
+                        .first()
         );
     }
 
