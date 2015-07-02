@@ -32,12 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onClickAnonToken() {
-            tokenProvider.getToken(UserTokenRequest.anon(), new TokenProvider.Callback() {
-                @Override
-                public void onTokenAcquired(Token token) {
-                    Toast.makeText(MainActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
-                }
-            });
+            tokenProvider.getToken(UserTokenRequest.anon());
         }
     };
 
