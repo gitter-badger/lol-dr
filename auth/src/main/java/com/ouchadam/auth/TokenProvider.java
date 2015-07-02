@@ -18,6 +18,7 @@ public class TokenProvider {
     }
 
     public void getToken(UserTokenRequest userTokenRequest, final Callback callback) {
+        // TODO remove callback and become blocking
         if (storedTokenIsValid()) {
             callback.onTokenAcquired(getStoredToken(userTokenRequest));
         } else if (hasStoredToken(userTokenRequest)){
