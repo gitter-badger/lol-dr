@@ -1,4 +1,4 @@
-package com.ouchadam.ui;
+package com.ouchadam.loldr.ui;
 
 import android.app.Activity;
 import android.view.View;

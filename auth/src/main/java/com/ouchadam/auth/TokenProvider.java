@@ -58,8 +58,4 @@ public class TokenProvider {
         foo.requestUserAuthentication(activity);
     }
 
-    public interface Callback {
-        void onTokenAcquired(Token token);
-    }
-
 }

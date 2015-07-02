@@ -9,7 +9,7 @@ import android.widget.Toast;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenProvider;
 import com.ouchadam.auth.UserTokenRequest;
-import com.ouchadam.ui.MainActivityPresenter;
+import com.ouchadam.loldr.ui.MainActivityPresenter;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
