@@ -7,6 +7,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
+
 public class OAuthWebViewActivity extends Activity {
 
     public static final String REDIRECT_URI = "http://com.ouchadam.kanto";
@@ -39,9 +43,27 @@ public class OAuthWebViewActivity extends Activity {
 
     private void onRedirect(String redirectUrl) {
         UserTokenRequest userTokenRequest = new UserTokenRequest(UserTokenRequest.Type.SIGNED_IN, redirectUrl);
-        TokenProvider.newInstance().getToken(userTokenRequest, new TokenProvider.Callback() {
+
+        Observable.just(userTokenRequest)
+                .map(new Func1<UserTokenRequest, Token>() {
+                         @Override
+                         public Token call(UserTokenRequest userTokenRequest) {
+                             return TokenProvider.newInstance().getToken(userTokenRequest);
+                         }
+                     }
+                ).subscribe(new Subscriber<Token>() {
             @Override
-            public void onTokenAcquired(Token token) {
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Token token) {
                 Intent data = new Intent();
                 data.putExtra("data", token.getUrlResponse());
                 setResult(RESULT_OK, data);

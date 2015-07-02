@@ -17,14 +17,14 @@ public class TokenProvider {
         this.foo = foo;
     }
 
-    public void getToken(UserTokenRequest userTokenRequest, final Callback callback) {
+    public Token getToken(UserTokenRequest userTokenRequest) {
         // TODO remove callback and become blocking
         if (storedTokenIsValid()) {
-            callback.onTokenAcquired(getStoredToken(userTokenRequest));
+            return getStoredToken(userTokenRequest);
         } else if (hasStoredToken(userTokenRequest)){
-            refreshToken(userTokenRequest, callback);
+            return refreshToken(userTokenRequest);
         } else {
-            requestNewToken(userTokenRequest, callback);
+            return requestNewToken(userTokenRequest);
         }
     }
 
@@ -36,25 +36,16 @@ public class TokenProvider {
         return false;
     }
 
-    private void refreshToken(UserTokenRequest userTokenRequest, Callback callback) {
-
+    private Token refreshToken(UserTokenRequest userTokenRequest) {
+        return null;
     }
 
-    private void requestNewToken(UserTokenRequest userTokenRequest, final Callback callback) {
+    private Token requestNewToken(UserTokenRequest userTokenRequest) {
         if (UserTokenRequest.Type.ANON == userTokenRequest.getType()) {
-            foo.requestSignedOutToken(wrapCallback(callback));
+            return foo.requestSignedOutToken();
         } else {
-            foo.requestToken(userTokenRequest.getCode(), wrapCallback(callback));
+            return foo.requestToken(userTokenRequest.getCode());
         }
-    }
-
-    private Foo.Callback wrapCallback(final Callback callback) {
-        return new Foo.Callback() {
-            @Override
-            public void onSuccess(Token token) {
-                callback.onTokenAcquired(token);
-            }
-        };
     }
 
     private Token getStoredToken(UserTokenRequest userTokenRequest) {

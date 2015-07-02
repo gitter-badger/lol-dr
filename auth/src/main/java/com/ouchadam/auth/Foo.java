@@ -22,9 +22,7 @@ import java.util.UUID;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 class Foo {
 
@@ -56,14 +54,12 @@ class Foo {
         activity.startActivityForResult(intent, 100);
     }
 
-    public void requestSignedOutToken(Callback callback) {
-        Log.e("!!!", "requestSignedOutToken");
-
-        Observable.just("")
+    public Token requestSignedOutToken() {
+        return new Token(Observable.just("")
                 .map(getSignedOutAccessToken())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(requestTokenFromApi(callback));
+                .toBlocking()
+                .first()
+        );
     }
 
     private Func1<Object, String> getSignedOutAccessToken() {
@@ -92,12 +88,12 @@ class Foo {
         };
     }
 
-    public void requestToken(String redirectUrl, Callback callback) {
-        Observable.just(redirectUrl)
+    public Token requestToken(String redirectUrl) {
+        return new Token(Observable.just(redirectUrl)
                 .map(getAccessToken())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(requestTokenFromApi(callback));
+                .toBlocking()
+                .first()
+        );
     }
 
     private Func1<String, String> getAccessToken() {
