@@ -44,7 +44,7 @@ class Foo {
         String duration = "temporary";
         String scope = "read";
 
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Intent intent = new Intent(activity, OAuthWebViewActivity.class);
         intent.setData(Uri.parse(BASE_URL
                 + CLIENT_ID
                 + "&response_type=" + responseType
@@ -52,7 +52,8 @@ class Foo {
                 + "&redirect_uri=" + REDIRECT_URI
                 + "&duration=" + duration
                 + "&scope=" + scope));
-        activity.startActivity(intent);
+
+        activity.startActivityForResult(intent, 100);
     }
 
     public void requestSignedOutToken(Callback callback) {

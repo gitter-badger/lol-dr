@@ -5,21 +5,7 @@
 
   <application>
 
-    <activity android:name=".OAuthRedirectActivity">
-
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-
-        <data
-          android:host="com.ouchadam.kanto"
-          android:scheme="http" />
-
-      </intent-filter>
-
-    </activity>
+    <activity android:name=".OAuthWebViewActivity" />
 
   </application>
 
