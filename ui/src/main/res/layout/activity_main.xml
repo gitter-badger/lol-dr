@@ -4,4 +4,16 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent">
 
+  <Button
+    android:id="@+id/button_sign_in"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Get user token" />
+
+  <Button
+    android:id="@+id/button_anon_sign_in"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Get anon token" />
+
 </LinearLayout>
