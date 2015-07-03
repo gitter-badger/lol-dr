@@ -45,21 +45,17 @@ final class PostSummaryViewHolder extends RecyclerView.ViewHolder {
         timeView.setText(time);
     }
 
-    public void setCommentsCount(int count) {
-        commentsView.setText(String.format("%1$d comment(s)", count));
+    public void setCommentsCount(String count) {
+        commentsView.setText(count);
     }
 
-    public void setSubredditName(String subredditName) {
+    public void setSubreddit(String subredditName) {
         subredditView.setText(subredditName);
     }
 
-    public interface PostSummaryClickListener {
+    public interface PostInteractionsListener {
 
-        // TODO: need to pass the ID of the post summary that was clicked back
-        void onClickPostSummary();
-
-        // TODO: need to pass the ID of the post summary that was clicked back
-        void onClickDownloadTogglePostSummary();
+        void onClick(Post post);
 
     }
 

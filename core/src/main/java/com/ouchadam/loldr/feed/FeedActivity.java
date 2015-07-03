@@ -12,6 +12,8 @@ public class FeedActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = Presenter.onCreate(this);
+
+        // TODO: presenter.present(List<Posts>)
     }
 
 }
