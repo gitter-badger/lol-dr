@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.ouchadam.ui.R;
+import com.ouchadam.loldr.ui.R;
 
 final class PostSummaryViewHolder extends RecyclerView.ViewHolder {
 

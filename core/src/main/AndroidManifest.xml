@@ -7,7 +7,7 @@
     android:icon="@mipmap/ic_launcher"
     android:theme="@style/AppTheme">
 
-    <activity android:name="com.ouchadam.loldr.MainActivity" />
+    <activity android:name="com.ouchadam.loldr.main.MainActivity" />
 
     <activity android:name="com.ouchadam.loldr.feed.FeedActivity">
       <intent-filter android:label="loldr feed">
@@ -20,7 +20,7 @@
     <activity-alias
       android:name="launcher_activity"
       android:label="@string/app_name"
-      android:targetActivity="com.ouchadam.loldr.MainActivity">
+      android:targetActivity="com.ouchadam.loldr.main.MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />

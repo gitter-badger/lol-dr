@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.ouchadam.ui.R;
+import com.ouchadam.loldr.ui.R;
 
 import java.util.List;
 

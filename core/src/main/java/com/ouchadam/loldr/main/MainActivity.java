@@ -1,15 +1,14 @@
-package com.ouchadam.loldr;
+package com.ouchadam.loldr.main;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenProvider;
 import com.ouchadam.auth.UserTokenRequest;
-import com.ouchadam.loldr.ui.MainActivityPresenter;
+import com.ouchadam.loldr.BaseActivity;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
