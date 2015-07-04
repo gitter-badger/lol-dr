@@ -50,6 +50,9 @@ public class Repository {
 
         @GET("/r/{subreddit}/hot")
         Observable<Feed> getSubreddit(@Path("subreddit") String subreddit);
+
+        @GET("/")
+        Observable<Feed> getFrontPage();
     }
 
     public static class Feed {
@@ -138,6 +141,10 @@ public class Repository {
 
     public Observable<Feed> subreddit(String subreddit) {
         return service.getSubreddit(subreddit);
+    }
+
+    public Observable<Feed> frontPage() {
+        return service.getFrontPage();
     }
 
     public interface TokenProvider {

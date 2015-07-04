@@ -27,7 +27,7 @@ public class FeedActivity extends BaseActivity {
         tokenProvider = TokenProvider.newInstance();
         presenter = Presenter.onCreate(this);
 
-        Repository.newInstance(provider).subreddit("all")
+        Repository.newInstance(provider).frontPage()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Repository.Feed>() {
