@@ -1,8 +1,10 @@
-package com.ouchadam.loldr.ui;
+package com.ouchadam.loldr.main;
 
 import android.app.Activity;
 import android.view.View;
 import android.widget.Toast;
+
+import com.ouchadam.loldr.ui.R;
 
 public class MainActivityPresenter {
 
