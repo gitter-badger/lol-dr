@@ -27,7 +27,7 @@ public class MainActivity extends BaseActivity {
 
         tokenProvider = TokenProvider.newInstance();
 
-        new Repository(provider).foo().subscribeOn(Schedulers.io())
+        Repository.newInstance(provider).foo().subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Subscriber<Repository.Post>() {
             @Override

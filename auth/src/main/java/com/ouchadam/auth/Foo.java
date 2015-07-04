@@ -72,6 +72,9 @@ class Foo {
                             subscriber.onError(e);
                             return;
                         }
+
+                        Log.e("!!!", "got token : " + anonymousAccessToken);
+
                         subscriber.onNext(new Token(anonymousAccessToken));
                         subscriber.onCompleted();
                     }
