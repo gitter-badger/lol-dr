@@ -10,28 +10,28 @@ import java.util.List;
 
 final class Presenter {
 
-    private final PostSummaryAdapter adapter;
-    private final Posts postsProvider;
+    private final RecyclerView.Adapter adapter;
+    private final Posts dataSource;
 
-    public static Presenter onCreate(Activity activity) {
+    static Presenter onCreate(Activity activity) {
         activity.setContentView(R.layout.activity_feed);
 
         RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
 
-        Posts postsProvider = Posts.newInstance();
-        PostSummaryAdapter adapter = new PostSummaryAdapter(postsProvider, activity.getLayoutInflater());
+        Posts dataSource = Posts.newInstance();
+        RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater());
         recyclerView.setAdapter(adapter);
-        return new Presenter(postsProvider, adapter);
+        return new Presenter(dataSource, adapter);
     }
 
-    private Presenter(Posts postsProvider, PostSummaryAdapter adapter) {
-        this.postsProvider = postsProvider;
+    private Presenter(Posts dataSource, RecyclerView.Adapter adapter) {
+        this.dataSource = dataSource;
         this.adapter = adapter;
     }
 
     public void present(List<PostSummary> postSummaries) {
-        postsProvider.set(postSummaries);
+        dataSource.set(postSummaries);
         adapter.notifyDataSetChanged();
     }
 
