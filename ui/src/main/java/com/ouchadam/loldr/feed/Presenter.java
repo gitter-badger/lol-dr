@@ -16,12 +16,13 @@ final class Presenter {
     static Presenter onCreate(Activity activity) {
         activity.setContentView(R.layout.activity_feed);
 
-        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
-
         Posts dataSource = Posts.newInstance();
         RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater());
+
+        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(adapter);
+
         return new Presenter(dataSource, adapter);
     }
 
