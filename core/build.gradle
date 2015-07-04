@@ -23,7 +23,9 @@ android {
 }
 
 dependencies {
-    compile project(':auth')
+    compile (project(':auth')) {
+        exclude module: 'okhttp'
+    }
     compile project(':ui')
     compile project(':data')
 }
