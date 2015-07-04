@@ -11,7 +11,6 @@ public class MainActivityPresenter {
     public static MainActivityPresenter onCreate(Activity activity, final Listener listener) {
         activity.setContentView(R.layout.activity_main);
 
-
         activity.findViewById(R.id.button_anon_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

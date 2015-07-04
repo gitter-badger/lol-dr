@@ -9,6 +9,7 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenProvider;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.data.Repository;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -25,6 +26,26 @@ public class MainActivity extends BaseActivity {
         mainActivityPresenter = MainActivityPresenter.onCreate(this, listener);
 
         tokenProvider = TokenProvider.newInstance();
+
+        Repository.newInstance(provider).subreddit("all").subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Subscriber<Repository.Feed>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Repository.Feed feed) {
+                Toast.makeText(MainActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private final MainActivityPresenter.Listener listener = new MainActivityPresenter.Listener() {
@@ -36,24 +57,24 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onClickAnonToken() {
             tokenProvider.getToken(UserTokenRequest.anon())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<Token>() {
-                @Override
-                public void onCompleted() {
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<Token>() {
+                        @Override
+                        public void onCompleted() {
 
-                }
+                        }
 
-                @Override
-                public void onError(Throwable e) {
+                        @Override
+                        public void onError(Throwable e) {
 
-                }
+                        }
 
-                @Override
-                public void onNext(Token token) {
-                    Toast.makeText(MainActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
-                }
-            });
+                        @Override
+                        public void onNext(Token token) {
+                            Toast.makeText(MainActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
+                        }
+                    });
         }
     };
 
@@ -65,4 +86,15 @@ public class MainActivity extends BaseActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
+    Repository.TokenProvider provider = new Repository.TokenProvider() {
+        @Override
+        public Repository.AccessToken provideAccessToken() {
+            Token token = tokenProvider.getToken(UserTokenRequest.anon()).toBlocking().first();
+            return new Repository.AccessToken(token.getUrlResponse());
+        }
+    };
+
+
 }

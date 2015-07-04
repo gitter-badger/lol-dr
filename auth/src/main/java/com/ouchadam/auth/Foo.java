@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Func1;
@@ -69,6 +72,7 @@ class Foo {
                             subscriber.onError(e);
                             return;
                         }
+
                         subscriber.onNext(new Token(anonymousAccessToken));
                         subscriber.onCompleted();
                     }
@@ -87,9 +91,14 @@ class Foo {
 
         Response response = new OkHttpClient().newCall(request).execute();
 
-        Log.e("!!!", "sending : " + request.urlString());
+        String result = response.body().string();
 
-        return response.body().string();
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            return jsonObject.getString("access_token");
+        } catch (JSONException e) {
+            throw new RuntimeException("failed to get token", e);
+        }
     }
 
     public Observable<Token> requestUserToken(String redirectUrl) {
@@ -115,9 +124,6 @@ class Foo {
                             .build();
 
                     Response response = new OkHttpClient().newCall(request).execute();
-
-                    Log.e("!!!", "sending : " + request.urlString());
-                    Log.e("!!!", "code : " + code);
 
                     return new Token(response.body().string());
                 } catch (Exception e) {
