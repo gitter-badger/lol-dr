@@ -9,6 +9,9 @@ import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.data.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -24,10 +27,10 @@ public class FeedActivity extends BaseActivity {
         tokenProvider = TokenProvider.newInstance();
         presenter = Presenter.onCreate(this);
 
-        Repository.newInstance(provider).foo()
+        Repository.newInstance(provider).subreddit("all")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Repository.Post>() {
+                .subscribe(new Subscriber<Repository.Feed>() {
                     @Override
                     public void onCompleted() {
 
@@ -39,12 +42,53 @@ public class FeedActivity extends BaseActivity {
                     }
 
                     @Override
-                    public void onNext(Repository.Post post) {
-                        Toast.makeText(FeedActivity.this, "" + post.count, Toast.LENGTH_LONG).show();
+                    public void onNext(Repository.Feed feed) {
+                        Toast.makeText(FeedActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
+
+                        List<Post> uiPosts = marshallToUi(feed);
+
+                        presenter.present(uiPosts);
+
                     }
                 });
 
         // TODO: presenter.present(List<Posts>)
+    }
+
+    private List<Post> marshallToUi(Repository.Feed feed) {
+        List<Repository.Post> dataPosts = feed.getPosts();
+        List<Post> posts = new ArrayList<>(dataPosts.size());
+
+        for (final Repository.Post dataPost : dataPosts) {
+            posts.add(new Post() {
+                @Override
+                public String getId() {
+                    return dataPost.getId();
+                }
+
+                @Override
+                public String getTitle() {
+                    return dataPost.getTitle();
+                }
+
+                @Override
+                public String getTime() {
+                    return String.valueOf(dataPost.getCreatedUtcTimeStamp());
+                }
+
+                @Override
+                public String getSubreddit() {
+                    return dataPost.getSubreddit();
+                }
+
+                @Override
+                public String getCommentCount() {
+                    return String.valueOf(dataPost.getCommentCount());
+                }
+            });
+        }
+
+        return posts;
     }
 
     private Repository.TokenProvider provider = new Repository.TokenProvider() {

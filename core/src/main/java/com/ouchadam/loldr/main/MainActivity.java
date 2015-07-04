@@ -27,9 +27,9 @@ public class MainActivity extends BaseActivity {
 
         tokenProvider = TokenProvider.newInstance();
 
-        Repository.newInstance(provider).foo().subscribeOn(Schedulers.io())
+        Repository.newInstance(provider).subreddit("all").subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Repository.Post>() {
+        .subscribe(new Subscriber<Repository.Feed>() {
             @Override
             public void onCompleted() {
 
@@ -41,8 +41,8 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(Repository.Post post) {
-                Toast.makeText(MainActivity.this, "" + post.count, Toast.LENGTH_LONG).show();
+            public void onNext(Repository.Feed feed) {
+                Toast.makeText(MainActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
             }
         });
 
