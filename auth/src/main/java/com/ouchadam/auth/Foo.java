@@ -73,8 +73,6 @@ class Foo {
                             return;
                         }
 
-                        Log.e("!!!", "got token : " + anonymousAccessToken);
-
                         subscriber.onNext(new Token(anonymousAccessToken));
                         subscriber.onCompleted();
                     }
@@ -93,9 +91,7 @@ class Foo {
 
         Response response = new OkHttpClient().newCall(request).execute();
 
-        Log.e("!!!", "sending : " + request.urlString());
         String result = response.body().string();
-        Log.e("!!!", "token : " + result);
 
         try {
             JSONObject jsonObject = new JSONObject(result);
@@ -128,10 +124,6 @@ class Foo {
                             .build();
 
                     Response response = new OkHttpClient().newCall(request).execute();
-
-                    Log.e("!!!", "sending : " + request.urlString());
-                    Log.e("!!!", "code : " + code);
-                    Log.e("!!!", "token : " + response.body().string());
 
                     return new Token(response.body().string());
                 } catch (Exception e) {
