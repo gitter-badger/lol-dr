@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 class PostSummaryAdapter extends RecyclerView.Adapter<PostSummaryViewHolder> {
 
     private final LayoutInflater layoutInflater;
-    private final PostsProvider postsProvider;
+    private final DataSource<PostSummary> dataSource;
 
-    PostSummaryAdapter(PostsProvider postsProvider, LayoutInflater layoutInflater) {
-        this.postsProvider = postsProvider;
+    PostSummaryAdapter(DataSource<PostSummary> dataSource, LayoutInflater layoutInflater) {
+        this.dataSource = dataSource;
         this.layoutInflater = layoutInflater;
     }
 
@@ -21,16 +21,16 @@ class PostSummaryAdapter extends RecyclerView.Adapter<PostSummaryViewHolder> {
 
     @Override
     public void onBindViewHolder(PostSummaryViewHolder viewHolder, int position) {
-        Post post = postsProvider.get(position);
-        viewHolder.setTitle(post.getTitle());
-        viewHolder.setTime(post.getTime());
-        viewHolder.setCommentsCount(post.getCommentCount());
-        viewHolder.setSubreddit(post.getSubreddit());
+        PostSummary postSummary = dataSource.get(position);
+        viewHolder.setTitle(postSummary.getTitle());
+        viewHolder.setTime(postSummary.getTime());
+        viewHolder.setCommentsCount(postSummary.getCommentCount());
+        viewHolder.setSubreddit(postSummary.getSubreddit());
     }
 
     @Override
     public int getItemCount() {
-        return postsProvider.size();
+        return dataSource.size();
     }
 
 }

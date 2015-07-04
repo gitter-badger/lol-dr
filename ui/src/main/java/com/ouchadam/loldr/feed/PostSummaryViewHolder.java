@@ -55,7 +55,7 @@ final class PostSummaryViewHolder extends RecyclerView.ViewHolder {
 
     public interface PostInteractionsListener {
 
-        void onClick(Post post);
+        void onClick(PostSummary postSummary);
 
     }
 

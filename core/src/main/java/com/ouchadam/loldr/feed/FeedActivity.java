@@ -51,9 +51,9 @@ public class FeedActivity extends BaseActivity {
             public void onNext(Repository.Feed feed) {
                 Toast.makeText(FeedActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
 
-                List<Post> uiPosts = marshallerFactory.posts().marshall(feed.getPosts());
+                List<PostSummary> postSummaries = marshallerFactory.posts().marshall(feed.getPosts());
 
-                presenter.present(uiPosts);
+                presenter.present(postSummaries);
 
             }
         };

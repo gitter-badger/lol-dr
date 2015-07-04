@@ -30,8 +30,8 @@ final class Presenter {
         this.adapter = adapter;
     }
 
-    public void present(List<Post> posts) {
-        postsProvider.set(posts);
+    public void present(List<PostSummary> postSummaries) {
+        postsProvider.set(postSummaries);
         adapter.notifyDataSetChanged();
     }
 
