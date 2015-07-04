@@ -10,7 +10,7 @@ import com.google.gson.JsonParseException;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.RestAdapter;
@@ -114,18 +114,25 @@ public class Repository {
         @Override
         public Feed deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonArray postsJson = json.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
-            JsonObject postJson = postsJson.get(0).getAsJsonObject().get("data").getAsJsonObject();
 
-            Post post = new Post(
-                    postJson.get("id").getAsString(),
-                    postJson.get("title").getAsString(),
-                    postJson.get("subreddit").getAsString(),
-                    postJson.get("ups").getAsInt(),
-                    postJson.get("num_comments").getAsInt(),
-                    postJson.get("created_utc").getAsLong()
-            );
+            List<Post> posts = new ArrayList<>(postsJson.size());
 
-            return new Feed(Collections.singletonList(post));
+            for (JsonElement postRootJson : postsJson) {
+                JsonObject postJson = postRootJson.getAsJsonObject().get("data").getAsJsonObject();
+
+                Post post = new Post(
+                        postJson.get("id").getAsString(),
+                        postJson.get("title").getAsString(),
+                        postJson.get("subreddit").getAsString(),
+                        postJson.get("ups").getAsInt(),
+                        postJson.get("num_comments").getAsInt(),
+                        postJson.get("created_utc").getAsLong()
+                );
+
+                posts.add(post);
+            }
+
+            return new Feed(posts);
         }
     }
 
