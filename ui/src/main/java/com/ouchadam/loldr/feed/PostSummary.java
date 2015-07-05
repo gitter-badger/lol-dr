@@ -1,6 +1,6 @@
 package com.ouchadam.loldr.feed;
 
-public interface Post {
+public interface PostSummary {
 
     String getId();
 

@@ -51,7 +51,7 @@ public class FeedActivity extends BaseActivity {
             @Override
             public void onNext(Data.Feed feed) {
                 List<Data.Post> dataPosts = feed.getPosts();
-                List<Post> uiPosts = marshallerFactory.posts().marshall(dataPosts);
+                List<PostSummary> uiPosts = marshallerFactory.posts().marshall(dataPosts);
 
                 presenter.present(uiPosts);
             }

@@ -3,31 +3,31 @@ package com.ouchadam.loldr.feed;
 import java.util.ArrayList;
 import java.util.List;
 
-class Posts implements PostsProvider {
+class Posts implements DataSource<PostSummary> {
 
-    private final List<Post> posts;
+    private final List<PostSummary> postSummaries;
 
     static Posts newInstance() {
-        return new Posts(new ArrayList<Post>());
+        return new Posts(new ArrayList<PostSummary>());
     }
 
-    private Posts(List<Post> posts) {
-        this.posts = posts;
+    private Posts(List<PostSummary> postSummaries) {
+        this.postSummaries = postSummaries;
     }
 
-    public void set(List<Post> posts) {
-        this.posts.clear();
-        this.posts.addAll(posts);
+    public void set(List<PostSummary> postSummaries) {
+        this.postSummaries.clear();
+        this.postSummaries.addAll(postSummaries);
     }
 
     @Override
     public int size() {
-        return posts.size();
+        return postSummaries.size();
     }
 
     @Override
-    public Post get(int position) {
-        return posts.get(position);
+    public PostSummary get(int position) {
+        return postSummaries.get(position);
     }
 
 }

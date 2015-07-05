@@ -7,7 +7,7 @@ import java.util.List;
 
 class MarshallerFactory {
 
-    public Marshaller<List<Post>, List<Data.Post>> posts() {
+    public Marshaller<List<PostSummary>, List<Data.Post>> posts() {
        return marshallList(post());
     }
 
@@ -24,11 +24,11 @@ class MarshallerFactory {
         };
     }
 
-    private Marshaller<Post, Data.Post> post() {
-        return new Marshaller<Post, Data.Post>() {
+    private Marshaller<PostSummary, Data.Post> post() {
+        return new Marshaller<PostSummary, Data.Post>() {
             @Override
-            public Post marshall(final Data.Post from) {
-                return new Post() {
+            public PostSummary marshall(final Data.Post from) {
+                return new PostSummary() {
                     @Override
                     public String getId() {
                         return from.getId();
