@@ -31,6 +31,8 @@ public class Data {
         String getId();
 
         String getBody();
+
+        String getAuthor();
     }
 
     public interface Comments {

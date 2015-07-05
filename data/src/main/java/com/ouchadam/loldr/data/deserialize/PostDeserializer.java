@@ -110,7 +110,8 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
             return createdUtc;
         }
 
-        public String getCommentAuthor() {
+        @Override
+        public String getAuthor() {
             return commentAuthor;
         }
     }
