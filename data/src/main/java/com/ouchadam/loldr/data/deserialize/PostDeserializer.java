@@ -31,6 +31,7 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
     private List<Comment> recurseOverAllComments(JsonObject commentThread, List<Comment> comments) {
         String kind = commentThread.get("kind").getAsString();
         if (kind.equals("more")) {
+            // TODO these type of comments require a different api call /api/morechildren taking the child ids
             return comments;
         }
 
@@ -43,9 +44,6 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
         }
 
         JsonArray replies = repliesRoot.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
-        if (replies.size() == 0) {
-            return comments;
-        }
 
         for (JsonElement reply : replies) {
             comments.addAll(recurseOverAllComments(reply.getAsJsonObject(), new ArrayList<Comment>()));
