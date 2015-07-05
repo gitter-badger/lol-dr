@@ -38,7 +38,10 @@ public class PostActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         this.tokenAcquirer = TokenAcquirer.newInstance();
 
-        Repository.newInstance(provider).subreddit("askreddit")
+        String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
+        String postId = getIntent().getStringExtra(EXTA_POST_ID);
+
+        Repository.newInstance(provider).comments(subreddit, postId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(presentResult());
