@@ -2,6 +2,7 @@ package com.ouchadam.loldr.data.deserialize;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.ouchadam.loldr.data.Data;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,9 +28,8 @@ public class PostDeserializerTest {
 
     @Test
     public void fooTest() {
-
-        for (PostDeserializer.Comment comment : comments.getComments()) {
-            System.out.println(comment.getBody() + " " + comment.getCommentAuthor());
+        for (Data.Comment comment : comments.getComments()) {
+            System.out.println(comment.getBody() + " " + comment.getId());
         }
 
         assertThat(this.comments.getComments()).hasSize(100);

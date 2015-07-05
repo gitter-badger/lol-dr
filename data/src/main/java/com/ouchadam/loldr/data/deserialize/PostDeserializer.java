@@ -6,19 +6,20 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.ouchadam.loldr.data.Data;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-class PostDeserializer implements JsonDeserializer<PostDeserializer.Comments> {
+class PostDeserializer implements JsonDeserializer<Data.Comments> {
 
     @Override
-    public Comments deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public Data.Comments deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject commentsRootJson = json.getAsJsonArray().get(1).getAsJsonObject();
         JsonArray rootCommentThread = commentsRootJson.get("data").getAsJsonObject().get("children").getAsJsonArray();
 
-        List<Comment> comments = new ArrayList<>();
+        List<Data.Comment> comments = new ArrayList<>();
         for (JsonElement jsonElement : rootCommentThread) {
             JsonObject asJsonObject = jsonElement.getAsJsonObject();
             comments.addAll(recurseOverAllComments(asJsonObject, new ArrayList<Comment>()));
@@ -26,7 +27,6 @@ class PostDeserializer implements JsonDeserializer<PostDeserializer.Comments> {
 
         return new Comments(comments);
     }
-
 
     private List<Comment> recurseOverAllComments(JsonObject commentThread, List<Comment> comments) {
         String kind = commentThread.get("kind").getAsString();
@@ -64,20 +64,21 @@ class PostDeserializer implements JsonDeserializer<PostDeserializer.Comments> {
         return new Comment(commentId, commentBody, commentName, commentTimestamp, commentAuthor);
     }
 
-    public static class Comments {
+    public static class Comments implements Data.Comments {
 
-        private final List<Comment> comments;
+        private final List<Data.Comment> comments;
 
-        public Comments(List<Comment> comments) {
+        public Comments(List<Data.Comment> comments) {
             this.comments = comments;
         }
 
-        public List<Comment> getComments() {
+        @Override
+        public List<Data.Comment> getComments() {
             return comments;
         }
     }
 
-    public static class Comment {
+    private static class Comment implements Data.Comment {
 
         private final String id;
         private final String body;
@@ -93,10 +94,12 @@ class PostDeserializer implements JsonDeserializer<PostDeserializer.Comments> {
             this.commentAuthor = commentAuthor;
         }
 
+        @Override
         public String getBody() {
             return body;
         }
 
+        @Override
         public String getId() {
             return id;
         }

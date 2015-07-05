@@ -48,8 +48,8 @@ public class PostActivity extends BaseActivity {
                 .subscribe(presentResult());
     }
 
-    private Subscriber<Data.Feed> presentResult() {
-        return new Subscriber<Data.Feed>() {
+    private Subscriber<Data.Comments> presentResult() {
+        return new Subscriber<Data.Comments>() {
             @Override
             public void onCompleted() {
                 // do nothing
@@ -61,8 +61,8 @@ public class PostActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(Data.Feed feed) {
-                List<Data.Post> dataPosts = feed.getPosts();
+            public void onNext(Data.Comments comments) {
+                List<Data.Comment> dataPosts = comments.getComments();
 
                 // TODO present the data!
             }

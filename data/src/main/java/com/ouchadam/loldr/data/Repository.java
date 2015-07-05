@@ -1,6 +1,5 @@
 package com.ouchadam.loldr.data;
 
-import com.google.gson.GsonBuilder;
 import com.ouchadam.loldr.data.deserialize.DeserializerFactory;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -25,7 +24,7 @@ public class Repository {
 
         RestAdapter retrofit = new RestAdapter.Builder()
                 .setEndpoint(ENDPOINT)
-                .setConverter(new GsonConverter(new DeserializerFactory().feed(new GsonBuilder()).create()))
+                .setConverter(new GsonConverter(new DeserializerFactory().create()))
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setClient(okClient)
                 .build();
@@ -45,7 +44,7 @@ public class Repository {
         return api.getSubreddit(subredditName, 100);
     }
 
-    public Observable<Data.Feed> comments(String subredditName, String postId) {
+    public Observable<Data.Comments> comments(String subredditName, String postId) {
         return api.getComments(subredditName, postId);
     }
 
@@ -57,7 +56,7 @@ public class Repository {
         Observable<Data.Feed> getSubreddit(@Path("subreddit") String subreddit, @Query("limit") int limit);
 
         @GET("/r/{subreddit}/comments/{postId}")
-        Observable<Data.Feed> getComments(@Path("subreddit") String subreddit, @Path("postId") String postId);
+        Observable<Data.Comments> getComments(@Path("subreddit") String subreddit, @Path("postId") String postId);
 
         @GET("/")
         Observable<Data.Feed> getFrontPage(@Query("limit") int limit);

@@ -25,4 +25,17 @@ public class Data {
         List<Data.Post> getPosts();
 
     }
+
+    public interface Comment {
+
+        String getId();
+
+        String getBody();
+    }
+
+    public interface Comments {
+
+        List<Data.Comment> getComments();
+
+    }
 }
