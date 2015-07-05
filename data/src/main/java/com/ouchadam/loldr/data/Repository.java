@@ -55,21 +55,4 @@ public class Repository {
         return service.getFrontPage();
     }
 
-    public interface TokenProvider {
-        AccessToken provideAccessToken();
-    }
-
-    public static class AccessToken {
-
-        private final String data;
-
-        public AccessToken(String data) {
-            this.data = data;
-        }
-
-        String get() {
-            return data;
-        }
-    }
-
 }

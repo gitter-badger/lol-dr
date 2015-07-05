@@ -43,7 +43,7 @@ public class OAuthWebViewActivity extends Activity {
 
     private void onRedirect(String redirectUrl) {
         UserTokenRequest userTokenRequest = new UserTokenRequest(UserTokenRequest.Type.SIGNED_IN, redirectUrl);
-        TokenProvider.newInstance().getToken(userTokenRequest)
+        TokenAcquirer.newInstance().acquireToken(userTokenRequest)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Token>() {

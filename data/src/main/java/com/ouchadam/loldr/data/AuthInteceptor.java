@@ -7,15 +7,15 @@ import java.io.IOException;
 
 class AuthInteceptor implements Interceptor {
 
-    private final Repository.TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
 
-    AuthInteceptor(Repository.TokenProvider tokenProvider) {
+    AuthInteceptor(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Repository.AccessToken accessToken = tokenProvider.provideAccessToken();
+        TokenProvider.AccessToken accessToken = tokenProvider.provideAccessToken();
 
         return chain.proceed(chain.request().newBuilder()
                         .addHeader("Authorization", "bearer " + accessToken.get())
