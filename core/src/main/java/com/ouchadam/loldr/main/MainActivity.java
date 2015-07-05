@@ -9,6 +9,7 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenProvider;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 
 import rx.Subscriber;
@@ -29,7 +30,7 @@ public class MainActivity extends BaseActivity {
 
         Repository.newInstance(provider).subreddit("all").subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Repository.Feed>() {
+        .subscribe(new Subscriber<Data.Feed>() {
             @Override
             public void onCompleted() {
 
@@ -41,7 +42,7 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(Repository.Feed feed) {
+            public void onNext(Data.Feed feed) {
                 Toast.makeText(MainActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
             }
         });

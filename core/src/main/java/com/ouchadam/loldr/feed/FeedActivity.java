@@ -8,6 +8,7 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenProvider;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 
 import java.util.List;
@@ -35,8 +36,8 @@ public class FeedActivity extends BaseActivity {
                 .subscribe(presentResult());
     }
 
-    private Subscriber<Repository.Feed> presentResult() {
-        return new Subscriber<Repository.Feed>() {
+    private Subscriber<Data.Feed> presentResult() {
+        return new Subscriber<Data.Feed>() {
             @Override
             public void onCompleted() {
                 // do nothing
@@ -48,7 +49,7 @@ public class FeedActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(Repository.Feed feed) {
+            public void onNext(Data.Feed feed) {
                 Toast.makeText(FeedActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
 
                 List<Post> uiPosts = marshallerFactory.posts().marshall(feed.getPosts());

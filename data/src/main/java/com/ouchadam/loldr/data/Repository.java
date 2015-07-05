@@ -1,17 +1,8 @@
 package com.ouchadam.loldr.data;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.ouchadam.loldr.data.deserialize.DeserializerFactory;
 import com.squareup.okhttp.OkHttpClient;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
@@ -23,6 +14,7 @@ import rx.Observable;
 public class Repository {
 
     private static final String ENDPOINT = "https://oauth.reddit.com/";
+
     private final RedditService service;
 
     public static Repository newInstance(TokenProvider tokenProvider) {
@@ -32,7 +24,7 @@ public class Repository {
 
         RestAdapter retrofit = new RestAdapter.Builder()
                 .setEndpoint(ENDPOINT)
-                .setConverter(new GsonConverter(new GsonBuilder().registerTypeAdapter(Feed.class, new FeedDeserializer()).create()))
+                .setConverter(new GsonConverter(new DeserializerFactory().feed(new GsonBuilder()).create()))
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setClient(okClient)
                 .build();
@@ -46,104 +38,20 @@ public class Repository {
 
     public interface RedditService {
         @GET("/api/v1/me")
-        Observable<Feed> getMe();
+        Observable<Data.Feed> getMe();
 
         @GET("/r/{subreddit}/hot")
-        Observable<Feed> getSubreddit(@Path("subreddit") String subreddit);
+        Observable<Data.Feed> getSubreddit(@Path("subreddit") String subreddit);
 
         @GET("/")
-        Observable<Feed> getFrontPage();
+        Observable<Data.Feed> getFrontPage();
     }
 
-    public static class Feed {
-
-        public final List<Post> posts;
-
-        public Feed(List<Post> posts) {
-            this.posts = posts;
-        }
-
-        public List<Post> getPosts() {
-            return posts;
-        }
-
-    }
-
-    public static class Post {
-
-        private final String id;
-        private final String title;
-        private final String subreddit;
-        private final int ups;
-        private final int commentCount;
-        private final long createdUtcTimeStamp;
-
-        public Post(String id, String title, String subreddit, int ups, int commentCount, long createdUtcTimeStamp) {
-            this.id = id;
-            this.title = title;
-            this.subreddit = subreddit;
-            this.ups = ups;
-            this.commentCount = commentCount;
-            this.createdUtcTimeStamp = createdUtcTimeStamp;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getSubreddit() {
-            return subreddit;
-        }
-
-        public int getUps() {
-            return ups;
-        }
-
-        public int getCommentCount() {
-            return commentCount;
-        }
-
-        public long getCreatedUtcTimeStamp() {
-            return createdUtcTimeStamp;
-        }
-    }
-
-    private static class FeedDeserializer implements JsonDeserializer<Feed> {
-
-        @Override
-        public Feed deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonArray postsJson = json.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
-
-            List<Post> posts = new ArrayList<>(postsJson.size());
-
-            for (JsonElement postRootJson : postsJson) {
-                JsonObject postJson = postRootJson.getAsJsonObject().get("data").getAsJsonObject();
-
-                Post post = new Post(
-                        postJson.get("id").getAsString(),
-                        postJson.get("title").getAsString(),
-                        postJson.get("subreddit").getAsString(),
-                        postJson.get("ups").getAsInt(),
-                        postJson.get("num_comments").getAsInt(),
-                        postJson.get("created_utc").getAsLong()
-                );
-
-                posts.add(post);
-            }
-
-            return new Feed(posts);
-        }
-    }
-
-    public Observable<Feed> subreddit(String subreddit) {
+    public Observable<Data.Feed> subreddit(String subreddit) {
         return service.getSubreddit(subreddit);
     }
 
-    public Observable<Feed> frontPage() {
+    public Observable<Data.Feed> frontPage() {
         return service.getFrontPage();
     }
 
