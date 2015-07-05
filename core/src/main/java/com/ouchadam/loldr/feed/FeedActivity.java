@@ -2,6 +2,7 @@ package com.ouchadam.loldr.feed;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
@@ -28,13 +29,20 @@ public class FeedActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         this.marshallerFactory = new MarshallerFactory();
         this.tokenAcquirer = TokenAcquirer.newInstance();
-        this.presenter = Presenter.onCreate(this);
+        this.presenter = Presenter.onCreate(this, listener);
 
-        Repository.newInstance(provider).frontPage()
+        Repository.newInstance(provider).subreddit("askreddit")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(presentResult());
     }
+
+    private final Presenter.Listener listener = new Presenter.Listener() {
+        @Override
+        public void onPostClicked(PostSummary postSummary) {
+            Toast.makeText(FeedActivity.this, postSummary.getTitle(), Toast.LENGTH_LONG).show();
+        }
+    };
 
     private Subscriber<Data.Feed> presentResult() {
         return new Subscriber<Data.Feed>() {
