@@ -2,7 +2,6 @@ package com.ouchadam.loldr.feed;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
@@ -11,6 +10,7 @@ import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
+import com.ouchadam.loldr.post.PostActivity;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public class FeedActivity extends BaseActivity {
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
         public void onPostClicked(PostSummary postSummary) {
-            Toast.makeText(FeedActivity.this, postSummary.getTitle(), Toast.LENGTH_LONG).show();
+            startActivity(PostActivity.create(postSummary.getSubreddit(), postSummary.getId()));
         }
     };
 

@@ -8,6 +8,7 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
@@ -20,7 +21,7 @@ import rx.schedulers.Schedulers;
 
 public class PostActivity extends BaseActivity {
 
-    private static final String ACTION = "action";
+    private static final String ACTION = BuildConfig.APPLICATION_ID + ".POST";
     private static final String EXTA_POST_ID = "postId";
     private static final String EXTRA_SUBREDDIT = "subreddit";
 
