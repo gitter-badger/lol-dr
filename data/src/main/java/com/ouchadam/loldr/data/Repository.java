@@ -45,12 +45,19 @@ public class Repository {
         return api.getSubreddit(subredditName, 100);
     }
 
+    public Observable<Data.Feed> comments(String subredditName, String postId) {
+        return api.getComments(subredditName, postId);
+    }
+
     interface Api {
         @GET("/api/v1/me")
         Observable<Data.Feed> getMe();
 
         @GET("/r/{subreddit}/hot")
         Observable<Data.Feed> getSubreddit(@Path("subreddit") String subreddit, @Query("limit") int limit);
+
+        @GET("/r/{subreddit}/comments/{postId}")
+        Observable<Data.Feed> getComments(@Path("subreddit") String subreddit, @Path("postId") String postId);
 
         @GET("/")
         Observable<Data.Feed> getFrontPage(@Query("limit") int limit);
