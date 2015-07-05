@@ -2,7 +2,6 @@ package com.ouchadam.loldr.feed;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;

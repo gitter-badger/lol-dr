@@ -15,7 +15,7 @@ public class Repository {
 
     private static final String ENDPOINT = "https://oauth.reddit.com/";
 
-    private final RedditService service;
+    private final Api api;
 
     public static Repository newInstance(TokenProvider tokenProvider) {
         OkHttpClient okHttpClient = new OkHttpClient();
@@ -29,14 +29,22 @@ public class Repository {
                 .setClient(okClient)
                 .build();
 
-        return new Repository(retrofit.create(RedditService.class));
+        return new Repository(retrofit.create(Api.class));
     }
 
-    Repository(RedditService service) {
-        this.service = service;
+    Repository(Api api) {
+        this.api = api;
     }
 
-    public interface RedditService {
+    public Observable<Data.Feed> frontPage() {
+        return api.getFrontPage();
+    }
+
+    public Observable<Data.Feed> subreddit(String subredditName) {
+        return api.getSubreddit(subredditName);
+    }
+
+    interface Api {
         @GET("/api/v1/me")
         Observable<Data.Feed> getMe();
 
@@ -45,14 +53,7 @@ public class Repository {
 
         @GET("/")
         Observable<Data.Feed> getFrontPage();
-    }
 
-    public Observable<Data.Feed> subreddit(String subreddit) {
-        return service.getSubreddit(subreddit);
-    }
-
-    public Observable<Data.Feed> frontPage() {
-        return service.getFrontPage();
     }
 
 }

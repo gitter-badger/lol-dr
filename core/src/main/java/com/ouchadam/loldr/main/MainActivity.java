@@ -9,9 +9,6 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
-import com.ouchadam.loldr.data.Data;
-import com.ouchadam.loldr.data.Repository;
-import com.ouchadam.loldr.data.TokenProvider;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -28,26 +25,6 @@ public class MainActivity extends BaseActivity {
         mainActivityPresenter = MainActivityPresenter.onCreate(this, listener);
 
         tokenAcquirer = TokenAcquirer.newInstance();
-
-        Repository.newInstance(provider).subreddit("all").subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Data.Feed>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Data.Feed feed) {
-                Toast.makeText(MainActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
-            }
-        });
-
     }
 
     private final MainActivityPresenter.Listener listener = new MainActivityPresenter.Listener() {
@@ -88,15 +65,5 @@ public class MainActivity extends BaseActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-
-    TokenProvider provider = new TokenProvider() {
-        @Override
-        public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken(UserTokenRequest.anon()).toBlocking().first();
-            return new TokenProvider.AccessToken(token.getUrlResponse());
-        }
-    };
-
 
 }
