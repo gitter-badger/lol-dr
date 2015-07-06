@@ -1,5 +1,7 @@
 package com.ouchadam.loldr.feed;
 
+import com.ouchadam.loldr.DataSource;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,11 @@ class Posts implements DataSource<PostSummary> {
     @Override
     public PostSummary get(int position) {
         return postSummaries.get(position);
+    }
+
+    @Override
+    public void close() {
+        // do nothing for now!
     }
 
 }

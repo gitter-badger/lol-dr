@@ -22,7 +22,7 @@ final class PostSummaryViewHolder extends RecyclerView.ViewHolder {
         View view = layoutInflater.inflate(R.layout.view_feed_post_summary, parent, false);
 
         TextView titleView = (TextView) view.findViewById(R.id.feed_post_summary_text_title);
-        TextView timeView = (TextView) view.findViewById(R.id.feed_post_summary_text_time);
+        TextView timeView = (TextView) view.findViewById(R.id.feed_post_summary_timestamp);
         TextView commentsView = (TextView) view.findViewById(R.id.feed_post_summary_text_comments);
         TextView subredditView = (TextView) view.findViewById(R.id.feed_post_summary_text_subreddit);
 

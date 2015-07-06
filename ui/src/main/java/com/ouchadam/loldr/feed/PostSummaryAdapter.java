@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ouchadam.loldr.DataSource;
+
 class PostSummaryAdapter extends RecyclerView.Adapter<PostSummaryViewHolder> {
 
     private final LayoutInflater layoutInflater;
