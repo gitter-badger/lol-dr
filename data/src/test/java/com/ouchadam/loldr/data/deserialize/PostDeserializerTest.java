@@ -6,6 +6,8 @@ import com.ouchadam.loldr.data.Data;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,11 +16,11 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class PostDeserializerTest {
 
-    private PostDeserializer.Comments comments;
+    private Data.Comments comments;
 
     @Before
     public void setUp() {
-        Class<PostDeserializer.Comments> type = PostDeserializer.Comments.class;
+        Class<Data.Comments> type = Data.Comments.class;
         Gson gson = new GsonBuilder().registerTypeAdapter(type, new PostDeserializer()).create();
         InputStream resourceAsStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("comment.json");
         InputStreamReader reader = new InputStreamReader(resourceAsStream);
@@ -28,11 +30,17 @@ public class PostDeserializerTest {
 
     @Test
     public void fooTest() {
-        for (Data.Comment comment : comments.getComments()) {
-            System.out.println(comment.getBody() + " " + comment.getDepth());
-        }
+        assertThat(filterMoreCommentsOut()).hasSize(100);
+    }
 
-        assertThat(this.comments.getComments()).hasSize(100);
+    private List<Data.Comment> filterMoreCommentsOut() {
+        List<Data.Comment> comments = new ArrayList<>();
+        for (Data.Comment comment : this.comments.getComments()) {
+            if (!comment.isMore()) {
+                comments.add(comment);
+            }
+        }
+        return comments;
     }
 
 }

@@ -22,16 +22,18 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
         List<Data.Comment> comments = new ArrayList<>();
         for (JsonElement jsonElement : rootCommentThread) {
             JsonObject asJsonObject = jsonElement.getAsJsonObject();
-            comments.addAll(recurseOverAllComments(asJsonObject, new ArrayList<Comment>(), 0));
+            comments.addAll(recurseOverAllComments(asJsonObject, new ArrayList<Data.Comment>(), 0));
         }
 
         return new Comments(comments);
     }
 
-    private List<Comment> recurseOverAllComments(JsonObject commentThread, List<Comment> comments, int depth) {
+    private List<Data.Comment> recurseOverAllComments(JsonObject commentThread, List<Data.Comment> comments, int depth) {
         String kind = commentThread.get("kind").getAsString();
         if (kind.equals("more")) {
             // TODO these type of comments require a different api call /api/morechildren taking the child ids
+            Data.Comment moreComment = moreComment(commentThread.get("data").getAsJsonObject(), depth);
+            comments.add(moreComment);
             return comments;
         }
 
@@ -46,10 +48,16 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
         JsonArray replies = repliesRoot.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
 
         for (JsonElement reply : replies) {
-            comments.addAll(recurseOverAllComments(reply.getAsJsonObject(), new ArrayList<Comment>(), depth + 1));
+            comments.addAll(recurseOverAllComments(reply.getAsJsonObject(), new ArrayList<Data.Comment>(), depth + 1));
         }
 
         return comments;
+    }
+
+    private Data.Comment moreComment(JsonObject data, int depth) {
+        String id = data.get("id").getAsString();
+        String name = data.get("name").getAsString();
+        return new MoreComment(id, name, depth);
     }
 
     private Comment parseComment(JsonObject jsonComment, int depth) {
@@ -62,7 +70,49 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
         return new Comment(commentId, commentBody, commentName, commentTimestamp, commentAuthor, depth);
     }
 
-    public static class Comments implements Data.Comments {
+    private static class MoreComment implements Data.Comment {
+
+        private final String id;
+        private final String name;
+        private final int depth;
+
+        public MoreComment(String id, String name, int depth) {
+            this.id = id;
+            this.name = name;
+            this.depth = depth;
+        }
+
+        @Override
+        public String getBody() {
+            throw new IllegalAccessError("This is a more comment! no body brah");
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getAuthor() {
+            throw new IllegalAccessError("This is a more comment! no author brah");
+        }
+
+        @Override
+        public int getDepth() {
+            return depth;
+        }
+
+        @Override
+        public boolean isMore() {
+            return true;
+        }
+    }
+
+    private static class Comments implements Data.Comments {
 
         private final List<Data.Comment> comments;
 
@@ -120,6 +170,11 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
         @Override
         public int getDepth() {
             return depth;
+        }
+
+        @Override
+        public boolean isMore() {
+            return false;
         }
     }
 

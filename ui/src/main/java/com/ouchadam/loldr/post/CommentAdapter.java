@@ -36,10 +36,16 @@ class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
     public void onBindViewHolder(CommentViewHolder viewHolder, int position) {
         Comment comment = dataSource.get(position);
 
-        viewHolder.setDepth(comment.getDepth());
         viewHolder.setPosition(position);
-        viewHolder.setBody(comment.getBody());
-        viewHolder.setAuthor(comment.getAuthor());
+        viewHolder.setDepth(comment.getDepth());
+
+        if (comment.isMore()) {
+            viewHolder.setBody("More comments blah");
+            viewHolder.setAuthor("");
+        } else {
+            viewHolder.setBody(comment.getBody());
+            viewHolder.setAuthor(comment.getAuthor());
+        }
     }
 
     @Override

@@ -102,6 +102,11 @@ public class PostActivity extends BaseActivity {
                     public int getDepth() {
                         return dataPosts.get(position).getDepth();
                     }
+
+                    @Override
+                    public boolean isMore() {
+                        return dataPosts.get(position).isMore();
+                    }
                 };
             }
 

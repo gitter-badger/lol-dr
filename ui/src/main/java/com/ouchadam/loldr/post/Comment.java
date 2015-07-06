@@ -10,4 +10,6 @@ public interface Comment {
 
     int getDepth();
 
+    boolean isMore();
+
 }
