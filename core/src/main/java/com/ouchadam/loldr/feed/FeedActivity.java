@@ -10,6 +10,7 @@ import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
+import com.ouchadam.loldr.post.PostActivity;
 
 import java.util.List;
 
@@ -28,13 +29,20 @@ public class FeedActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         this.marshallerFactory = new MarshallerFactory();
         this.tokenAcquirer = TokenAcquirer.newInstance();
-        this.presenter = Presenter.onCreate(this);
+        this.presenter = Presenter.onCreate(this, listener);
 
-        Repository.newInstance(provider).frontPage()
+        Repository.newInstance(provider).subreddit("askreddit")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(presentResult());
     }
+
+    private final Presenter.Listener listener = new Presenter.Listener() {
+        @Override
+        public void onPostClicked(PostSummary postSummary) {
+            startActivity(PostActivity.create(postSummary.getSubreddit(), postSummary.getId()));
+        }
+    };
 
     private Subscriber<Data.Feed> presentResult() {
         return new Subscriber<Data.Feed>() {

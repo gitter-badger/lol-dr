@@ -5,22 +5,12 @@
   android:layout_height="match_parent">
 
   <TextView
-    android:id="@+id/feed_post_summary_text_title"
+    android:id="@+id/post_comment_body"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 
   <TextView
-    android:id="@+id/feed_post_summary_timestamp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
-
-  <TextView
-    android:id="@+id/feed_post_summary_text_comments"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
-
-  <TextView
-    android:id="@+id/feed_post_summary_text_subreddit"
+    android:id="@+id/post_comment_author"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 
