@@ -6,10 +6,9 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
-import com.ouchadam.auth.TokenProvider;
+import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
-import com.ouchadam.loldr.data.Repository;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -18,45 +17,25 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends BaseActivity {
 
     private MainActivityPresenter mainActivityPresenter;
-    private TokenProvider tokenProvider;
+    private TokenAcquirer tokenAcquirer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivityPresenter = MainActivityPresenter.onCreate(this, listener);
 
-        tokenProvider = TokenProvider.newInstance();
-
-        Repository.newInstance(provider).subreddit("all").subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Repository.Feed>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Repository.Feed feed) {
-                Toast.makeText(MainActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
-            }
-        });
-
+        tokenAcquirer = TokenAcquirer.newInstance();
     }
 
     private final MainActivityPresenter.Listener listener = new MainActivityPresenter.Listener() {
         @Override
         public void onClickUserToken() {
-            tokenProvider.createUserToken(MainActivity.this);
+            tokenAcquirer.createUserToken(MainActivity.this);
         }
 
         @Override
         public void onClickAnonToken() {
-            tokenProvider.getToken(UserTokenRequest.anon())
+            tokenAcquirer.acquireToken(UserTokenRequest.anon())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<Token>() {
@@ -86,15 +65,5 @@ public class MainActivity extends BaseActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
     }
-
-
-    Repository.TokenProvider provider = new Repository.TokenProvider() {
-        @Override
-        public Repository.AccessToken provideAccessToken() {
-            Token token = tokenProvider.getToken(UserTokenRequest.anon()).toBlocking().first();
-            return new Repository.AccessToken(token.getUrlResponse());
-        }
-    };
-
 
 }

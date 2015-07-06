@@ -13,11 +13,11 @@ final class Presenter {
     private final RecyclerView.Adapter adapter;
     private final Posts dataSource;
 
-    static Presenter onCreate(Activity activity) {
+    static Presenter onCreate(Activity activity, Listener listener) {
         activity.setContentView(R.layout.activity_feed);
 
         Posts dataSource = Posts.newInstance();
-        RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater());
+        RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater(), listener);
 
         RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -34,6 +34,10 @@ final class Presenter {
     public void present(List<PostSummary> postSummaries) {
         dataSource.set(postSummaries);
         adapter.notifyDataSetChanged();
+    }
+
+    public interface Listener {
+        void onPostClicked(PostSummary postSummary);
     }
 
 }

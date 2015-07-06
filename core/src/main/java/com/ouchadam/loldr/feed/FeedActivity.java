@@ -2,13 +2,15 @@ package com.ouchadam.loldr.feed;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
-import com.ouchadam.auth.TokenProvider;
+import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
+import com.ouchadam.loldr.data.TokenProvider;
+import com.ouchadam.loldr.post.PostActivity;
 
 import java.util.List;
 
@@ -18,7 +20,7 @@ import rx.schedulers.Schedulers;
 
 public class FeedActivity extends BaseActivity {
 
-    private TokenProvider tokenProvider;
+    private TokenAcquirer tokenAcquirer;
     private Presenter presenter;
     private MarshallerFactory marshallerFactory;
 
@@ -26,17 +28,24 @@ public class FeedActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.marshallerFactory = new MarshallerFactory();
-        this.tokenProvider = TokenProvider.newInstance();
-        this.presenter = Presenter.onCreate(this);
+        this.tokenAcquirer = TokenAcquirer.newInstance();
+        this.presenter = Presenter.onCreate(this, listener);
 
-        Repository.newInstance(provider).frontPage()
+        Repository.newInstance(provider).subreddit("askreddit")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(presentResult());
     }
 
-    private Subscriber<Repository.Feed> presentResult() {
-        return new Subscriber<Repository.Feed>() {
+    private final Presenter.Listener listener = new Presenter.Listener() {
+        @Override
+        public void onPostClicked(PostSummary postSummary) {
+            startActivity(PostActivity.create(postSummary.getSubreddit(), postSummary.getId()));
+        }
+    };
+
+    private Subscriber<Data.Feed> presentResult() {
+        return new Subscriber<Data.Feed>() {
             @Override
             public void onCompleted() {
                 // do nothing
@@ -48,22 +57,20 @@ public class FeedActivity extends BaseActivity {
             }
 
             @Override
-            public void onNext(Repository.Feed feed) {
-                Toast.makeText(FeedActivity.this, "" + feed.getPosts().size(), Toast.LENGTH_LONG).show();
+            public void onNext(Data.Feed feed) {
+                List<Data.Post> dataPosts = feed.getPosts();
+                List<PostSummary> uiPosts = marshallerFactory.posts().marshall(dataPosts);
 
-                List<PostSummary> postSummaries = marshallerFactory.posts().marshall(feed.getPosts());
-
-                presenter.present(postSummaries);
-
+                presenter.present(uiPosts);
             }
         };
     }
 
-    private Repository.TokenProvider provider = new Repository.TokenProvider() {
+    private TokenProvider provider = new TokenProvider() {
         @Override
-        public Repository.AccessToken provideAccessToken() {
-            Token token = tokenProvider.getToken(UserTokenRequest.anon()).toBlocking().first();
-            return new Repository.AccessToken(token.getUrlResponse());
+        public TokenProvider.AccessToken provideAccessToken() {
+            Token token = tokenAcquirer.acquireToken(UserTokenRequest.anon()).toBlocking().first();
+            return new TokenProvider.AccessToken(token.getUrlResponse());
         }
     };
 

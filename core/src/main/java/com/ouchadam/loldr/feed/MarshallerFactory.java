@@ -1,13 +1,13 @@
 package com.ouchadam.loldr.feed;
 
-import com.ouchadam.loldr.data.Repository;
+import com.ouchadam.loldr.data.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class MarshallerFactory {
 
-    public Marshaller<List<PostSummary>, List<Repository.Post>> posts() {
+    public Marshaller<List<PostSummary>, List<Data.Post>> posts() {
        return marshallList(post());
     }
 
@@ -24,10 +24,10 @@ class MarshallerFactory {
         };
     }
 
-    private Marshaller<PostSummary, Repository.Post> post() {
-        return new Marshaller<PostSummary, Repository.Post>() {
+    private Marshaller<PostSummary, Data.Post> post() {
+        return new Marshaller<PostSummary, Data.Post>() {
             @Override
-            public PostSummary marshall(final Repository.Post from) {
+            public PostSummary marshall(final Data.Post from) {
                 return new PostSummary() {
                     @Override
                     public String getId() {

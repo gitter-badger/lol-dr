@@ -6,20 +6,20 @@ import java.util.UUID;
 
 import rx.Observable;
 
-public class TokenProvider {
+public class TokenAcquirer {
 
     private final Foo foo;
 
-    public static TokenProvider newInstance() {
+    public static TokenAcquirer newInstance() {
         UUID deviceId = UUID.randomUUID();
-        return new TokenProvider(new Foo(deviceId));
+        return new TokenAcquirer(new Foo(deviceId));
     }
 
-    public TokenProvider(Foo foo) {
+    public TokenAcquirer(Foo foo) {
         this.foo = foo;
     }
 
-    public Observable<Token> getToken(UserTokenRequest userTokenRequest) {
+    public Observable<Token> acquireToken(UserTokenRequest userTokenRequest) {
         // TODO remove callback and become blocking
         if (storedTokenIsValid()) {
             return getStoredToken(userTokenRequest);

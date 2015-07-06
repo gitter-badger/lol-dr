@@ -17,6 +17,13 @@
       </intent-filter>
     </activity>
 
+    <activity android:name="com.ouchadam.loldr.post.PostActivity">
+      <intent-filter android:label="loldr post">
+        <action android:name="${applicationId}.POST" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
+
     <activity-alias
       android:name="launcher_activity"
       android:label="@string/app_name"
