@@ -29,7 +29,7 @@ public class PostDeserializerTest {
     @Test
     public void fooTest() {
         for (Data.Comment comment : comments.getComments()) {
-            System.out.println(comment.getBody() + " " + comment.getId());
+            System.out.println(comment.getBody() + " " + comment.getDepth());
         }
 
         assertThat(this.comments.getComments()).hasSize(100);

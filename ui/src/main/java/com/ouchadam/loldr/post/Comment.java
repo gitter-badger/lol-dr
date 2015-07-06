@@ -8,4 +8,6 @@ public interface Comment {
 
     String getAuthor();
 
+    int getDepth();
+
 }
