@@ -12,11 +12,14 @@ final class CommentViewHolder extends RecyclerView.ViewHolder {
 
     public static final int POSITION_KEY = R.id.tag_feed_position;
 
+    static final int VIEW_TYPE_MORE = 100;
+    static final int VIEW_TYPE_COMMENT = 50;
+
     private final View rootView;
     private final TextView bodyView;
     private final TextView authorView;
 
-    static CommentViewHolder inflate(ViewGroup parent, LayoutInflater layoutInflater, View.OnClickListener postClickListener) {
+    static CommentViewHolder inflateComment(ViewGroup parent, LayoutInflater layoutInflater, View.OnClickListener postClickListener) {
         View view = layoutInflater.inflate(R.layout.view_post_comment, parent, false);
 
         TextView bodyView = (TextView) view.findViewById(R.id.post_comment_body);
@@ -25,6 +28,15 @@ final class CommentViewHolder extends RecyclerView.ViewHolder {
         view.setOnClickListener(postClickListener);
 
         return new CommentViewHolder(view, bodyView, authorView);
+    }
+
+    static CommentViewHolder inflateMore(ViewGroup parent, LayoutInflater layoutInflater, View.OnClickListener postClickListener) {
+        View view = layoutInflater.inflate(R.layout.view_post_more_comment, parent, false);
+
+        TextView bodyView = (TextView) view.findViewById(R.id.post_comment_body);
+        view.setOnClickListener(postClickListener);
+
+        return new CommentViewHolder(view, bodyView, null);
     }
 
     private CommentViewHolder(View itemView, TextView bodyView, TextView authorView) {
@@ -48,6 +60,6 @@ final class CommentViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setDepth(int depth) {
-        bodyView.setPadding(depth * 80, 0, 0, 0);
+        rootView.setPadding(depth * 40, rootView.getPaddingTop(), rootView.getPaddingRight(), rootView.getPaddingBottom());
     }
 }
