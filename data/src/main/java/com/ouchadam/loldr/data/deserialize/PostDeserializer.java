@@ -61,11 +61,11 @@ class PostDeserializer implements JsonDeserializer<Data.Comments> {
     }
 
     private Comment parseComment(JsonObject jsonComment, int depth) {
-        String commentId = jsonComment.get("id").getAsString();
-        String commentBody = jsonComment.get("body").getAsString();
-        String commentName = jsonComment.get("name").getAsString();
+        String commentId = jsonComment.get("id").getAsString().trim();
+        String commentBody = jsonComment.get("body").getAsString().trim();
+        String commentName = jsonComment.get("name").getAsString().trim();
         long commentTimestamp = jsonComment.get("created_utc").getAsLong();
-        String commentAuthor = jsonComment.get("author").getAsString();
+        String commentAuthor = jsonComment.get("author").getAsString().trim();
 
         return new Comment(commentId, commentBody, commentName, commentTimestamp, commentAuthor, depth);
     }
