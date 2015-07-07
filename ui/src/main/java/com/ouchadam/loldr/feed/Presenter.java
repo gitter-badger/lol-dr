@@ -13,15 +13,34 @@ final class Presenter {
     private final RecyclerView.Adapter adapter;
     private final Posts dataSource;
 
-    static Presenter onCreate(Activity activity, Listener listener) {
+    static Presenter onCreate(Activity activity, final Listener listener) {
         activity.setContentView(R.layout.activity_feed);
 
         Posts dataSource = Posts.newInstance();
-        RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater(), listener);
+        final RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater(), listener);
 
         RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(adapter);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            private int prevItemCount = 0;
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                RecyclerView.Adapter adapter = recyclerView.getAdapter();
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                int itemCount = adapter.getItemCount();
+
+                if (prevItemCount != itemCount && lastVisibleItemPosition >= (itemCount - 1) - 15) {
+                    prevItemCount = itemCount;
+                    listener.onNextPageRequest();
+                }
+            }
+        });
 
         return new Presenter(dataSource, adapter);
     }
@@ -38,6 +57,8 @@ final class Presenter {
 
     public interface Listener {
         void onPostClicked(PostSummary postSummary);
+
+        void onNextPageRequest();
     }
 
 }

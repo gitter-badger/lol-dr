@@ -44,6 +44,10 @@ public class Repository {
         return api.getSubreddit(subredditName, 100);
     }
 
+    public Observable<Data.Feed> subreddit(String subredditName, String afterId) {
+        return api.getSubreddit(subredditName, 100, afterId);
+    }
+
     public Observable<Data.Comments> comments(String subredditName, String postId) {
         return api.getComments(subredditName, postId);
     }
@@ -54,6 +58,9 @@ public class Repository {
 
         @GET("/r/{subreddit}/hot")
         Observable<Data.Feed> getSubreddit(@Path("subreddit") String subreddit, @Query("limit") int limit);
+
+        @GET("/r/{subreddit}/hot")
+        Observable<Data.Feed> getSubreddit(@Path("subreddit") String subreddit, @Query("limit") int limit, @Query("after") String afterId);
 
         @GET("/r/{subreddit}/comments/{postId}")
         Observable<Data.Comments> getComments(@Path("subreddit") String subreddit, @Path("postId") String postId);

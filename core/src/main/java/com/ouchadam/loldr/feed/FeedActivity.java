@@ -23,6 +23,7 @@ public class FeedActivity extends BaseActivity {
     private TokenAcquirer tokenAcquirer;
     private Presenter presenter;
     private MarshallerFactory marshallerFactory;
+    private String afterId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,14 @@ public class FeedActivity extends BaseActivity {
         public void onPostClicked(PostSummary postSummary) {
             startActivity(PostActivity.create(postSummary.getSubreddit(), postSummary.getId()));
         }
+
+        @Override
+        public void onNextPageRequest() {
+            Repository.newInstance(provider).subreddit("askreddit", afterId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(presentResult());
+        }
     };
 
     private Subscriber<Data.Feed> presentResult() {
@@ -58,6 +67,7 @@ public class FeedActivity extends BaseActivity {
 
             @Override
             public void onNext(Data.Feed feed) {
+                FeedActivity.this.afterId = feed.afterId();
                 List<Data.Post> dataPosts = feed.getPosts();
                 List<PostSummary> uiPosts = marshallerFactory.posts().marshall(dataPosts);
 

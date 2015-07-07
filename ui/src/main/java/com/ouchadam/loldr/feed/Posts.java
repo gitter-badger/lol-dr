@@ -18,7 +18,6 @@ class Posts implements DataSource<PostSummary> {
     }
 
     public void set(List<PostSummary> postSummaries) {
-        this.postSummaries.clear();
         this.postSummaries.addAll(postSummaries);
     }
 
