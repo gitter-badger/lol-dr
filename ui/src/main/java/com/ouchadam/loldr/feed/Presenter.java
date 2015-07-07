@@ -23,24 +23,7 @@ final class Presenter {
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(adapter);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            private int prevItemCount = 0;
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                RecyclerView.Adapter adapter = recyclerView.getAdapter();
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-
-                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                int itemCount = adapter.getItemCount();
-
-                if (prevItemCount != itemCount && lastVisibleItemPosition >= (itemCount - 1) - 15) {
-                    prevItemCount = itemCount;
-                    listener.onNextPageRequest();
-                }
-            }
-        });
+        recyclerView.addOnScrollListener(new PagingScrollListener(listener));
 
         return new Presenter(dataSource, adapter);
     }
@@ -51,14 +34,43 @@ final class Presenter {
     }
 
     public void present(List<PostSummary> postSummaries) {
+        int previousSize = dataSource.size();
+
         dataSource.set(postSummaries);
-        adapter.notifyDataSetChanged();
+        adapter.notifyItemRangeInserted(previousSize, postSummaries.size());
     }
 
-    public interface Listener {
+    public interface Listener extends PagingListener {
         void onPostClicked(PostSummary postSummary);
+    }
 
+    interface PagingListener {
         void onNextPageRequest();
+    }
+
+    static class PagingScrollListener extends RecyclerView.OnScrollListener {
+
+        private final PagingListener pagingListener;
+        private int prevItemCount = 0;
+
+        PagingScrollListener(PagingListener pagingListener) {
+            this.pagingListener = pagingListener;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+            int itemCount = adapter.getItemCount();
+
+            if (prevItemCount != itemCount && lastVisibleItemPosition >= (itemCount - 1) - 15) {
+                prevItemCount = itemCount;
+                pagingListener.onNextPageRequest();
+            }
+        }
+
     }
 
 }
