@@ -33,6 +33,10 @@ public class Data {
         String getBody();
 
         String getAuthor();
+
+        int getDepth();
+
+        boolean isMore();
     }
 
     public interface Comments {

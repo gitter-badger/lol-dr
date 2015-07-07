@@ -12,11 +12,14 @@ final class CommentViewHolder extends RecyclerView.ViewHolder {
 
     public static final int POSITION_KEY = R.id.tag_feed_position;
 
-    private final View rootView;
-    private final TextView titleView;
-    private final TextView timeView;
+    static final int VIEW_TYPE_MORE = 100;
+    static final int VIEW_TYPE_COMMENT = 50;
 
-    static CommentViewHolder inflate(ViewGroup parent, LayoutInflater layoutInflater, View.OnClickListener postClickListener) {
+    private final View rootView;
+    private final TextView bodyView;
+    private final TextView authorView;
+
+    static CommentViewHolder inflateComment(ViewGroup parent, LayoutInflater layoutInflater, View.OnClickListener postClickListener) {
         View view = layoutInflater.inflate(R.layout.view_post_comment, parent, false);
 
         TextView bodyView = (TextView) view.findViewById(R.id.post_comment_body);
@@ -27,24 +30,36 @@ final class CommentViewHolder extends RecyclerView.ViewHolder {
         return new CommentViewHolder(view, bodyView, authorView);
     }
 
-    private CommentViewHolder(View itemView, TextView titleView, TextView timeView) {
+    static CommentViewHolder inflateMore(ViewGroup parent, LayoutInflater layoutInflater, View.OnClickListener postClickListener) {
+        View view = layoutInflater.inflate(R.layout.view_post_more_comment, parent, false);
+
+        TextView bodyView = (TextView) view.findViewById(R.id.post_comment_body);
+        view.setOnClickListener(postClickListener);
+
+        return new CommentViewHolder(view, bodyView, null);
+    }
+
+    private CommentViewHolder(View itemView, TextView bodyView, TextView authorView) {
         super(itemView);
         this.rootView = itemView;
-        this.titleView = titleView;
-        this.timeView = timeView;
+        this.bodyView = bodyView;
+        this.authorView = authorView;
     }
 
     public void setBody(String title) {
-        titleView.setText(title);
+        bodyView.setText(title);
         rootView.setContentDescription(title);
     }
 
     public void setAuthor(String time) {
-        timeView.setText(time);
+        authorView.setText(time);
     }
 
     public void setPosition(int position) {
         rootView.setTag(POSITION_KEY, position);
     }
 
+    public void setDepth(int depth) {
+        rootView.setPadding(depth * 40, rootView.getPaddingTop(), rootView.getPaddingRight(), rootView.getPaddingBottom());
+    }
 }

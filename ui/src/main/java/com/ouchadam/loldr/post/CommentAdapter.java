@@ -22,14 +22,21 @@ class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
     }
 
     @Override
-    public CommentViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
-        return CommentViewHolder.inflate(viewGroup, layoutInflater, new View.OnClickListener() {
+    public CommentViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        if (viewType == CommentViewHolder.VIEW_TYPE_COMMENT) {
+            return CommentViewHolder.inflateComment(viewGroup, layoutInflater, getPostClickListener());
+        }
+        return CommentViewHolder.inflateMore(viewGroup, layoutInflater, getPostClickListener());
+    }
+
+    private View.OnClickListener getPostClickListener() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Comment comment = dataSource.get((Integer) view.getTag(CommentViewHolder.POSITION_KEY));
                 listener.onCommentClicked(comment);
             }
-        });
+        };
     }
 
     @Override
@@ -37,8 +44,17 @@ class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
         Comment comment = dataSource.get(position);
 
         viewHolder.setPosition(position);
-        viewHolder.setBody(comment.getBody());
-        viewHolder.setAuthor(comment.getAuthor());
+        viewHolder.setDepth(comment.getDepth());
+
+        if (!comment.isMore()) {
+            viewHolder.setBody(comment.getBody());
+            viewHolder.setAuthor(comment.getAuthor());
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return dataSource.get(position).isMore() ? CommentViewHolder.VIEW_TYPE_MORE : CommentViewHolder.VIEW_TYPE_COMMENT;
     }
 
     @Override

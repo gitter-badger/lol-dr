@@ -97,6 +97,16 @@ public class PostActivity extends BaseActivity {
                     public String getAuthor() {
                         return dataPosts.get(position).getAuthor();
                     }
+
+                    @Override
+                    public int getDepth() {
+                        return dataPosts.get(position).getDepth();
+                    }
+
+                    @Override
+                    public boolean isMore() {
+                        return dataPosts.get(position).isMore();
+                    }
                 };
             }
 
