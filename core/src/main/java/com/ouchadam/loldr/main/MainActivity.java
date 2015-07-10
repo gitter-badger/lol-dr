@@ -24,7 +24,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         mainActivityPresenter = MainActivityPresenter.onCreate(this, listener);
 
-        tokenAcquirer = TokenAcquirer.newInstance();
+        tokenAcquirer = TokenAcquirer.newInstance(this);
     }
 
     private final MainActivityPresenter.Listener listener = new MainActivityPresenter.Listener() {
@@ -51,7 +51,7 @@ public class MainActivity extends BaseActivity {
 
                         @Override
                         public void onNext(Token token) {
-                            Toast.makeText(MainActivity.this, token.getUrlResponse(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(MainActivity.this, token.getRawToken(), Toast.LENGTH_LONG).show();
                         }
                     });
         }

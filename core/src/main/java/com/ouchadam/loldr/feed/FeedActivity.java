@@ -30,7 +30,7 @@ public class FeedActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.tokenAcquirer = TokenAcquirer.newInstance();
+        this.tokenAcquirer = TokenAcquirer.newInstance(this);
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
 
@@ -83,7 +83,7 @@ public class FeedActivity extends BaseActivity {
         @Override
         public TokenProvider.AccessToken provideAccessToken() {
             Token token = tokenAcquirer.acquireToken(UserTokenRequest.anon()).toBlocking().first();
-            return new TokenProvider.AccessToken(token.getUrlResponse());
+            return new TokenProvider.AccessToken(token.getRawToken());
         }
     };
 

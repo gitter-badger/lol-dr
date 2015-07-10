@@ -3,6 +3,7 @@ package com.ouchadam.auth;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.MediaType;
@@ -42,7 +43,7 @@ class Foo {
     public void requestUserAuthentication(Activity activity) {
         String responseType = "code";
         String requestId = "RANDOM_STRING";
-        String duration = "temporary";
+        String duration = "permanent";
         String scope = "read";
 
         Intent intent = new Intent(activity, OAuthWebViewActivity.class);
@@ -98,8 +99,8 @@ class Foo {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
-
-            return new Token(rawToken);
+            int expiryInSeconds = jsonObject.getInt("expires_in");
+            return new Token(rawToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
@@ -129,7 +130,11 @@ class Foo {
 
                     Response response = new OkHttpClient().newCall(request).execute();
 
-                    return parseToken(response.body().toString());
+                    String result = response.body().string();
+
+                    Log.e("!!!", result);
+
+                    return parseToken(result);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -165,4 +170,27 @@ class Foo {
         }
     }
 
+    public Observable<Token> refreshToken(Token token) {
+        return Observable.just(token).map(new Func1<Token, Token>() {
+            @Override
+            public Token call(Token token) {
+                try {
+                    MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
+                    Request request = new Request.Builder()
+                            .url("https://www.reddit.com/api/v1/access_token")
+                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + token.getRawToken()))
+                            .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
+                            .build();
+
+                    Response response = new OkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+
+                    return parseToken(result);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 }
