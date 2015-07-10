@@ -4,20 +4,22 @@ import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.ouchadam.loldr.DataSource;
+import com.ouchadam.loldr.SourceProvider;
 import com.ouchadam.loldr.ui.R;
 
-import java.util.List;
+final class Presenter<T extends DataSource<PostSummary>> {
 
-final class Presenter {
+    private final PostSummaryAdapter<T> adapter;
 
-    private final RecyclerView.Adapter adapter;
-    private final Posts dataSource;
+    static <T extends DataSource<PostSummary>> Presenter<T> onCreate(
+            Activity activity,
+            SourceProvider<PostSummary, T> dataSource,
+            Listener listener) {
 
-    static Presenter onCreate(Activity activity, final Listener listener) {
         activity.setContentView(R.layout.activity_feed);
 
-        Posts dataSource = Posts.newInstance();
-        final RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater(), listener);
+        PostSummaryAdapter<T> adapter = new PostSummaryAdapter<>(activity.getLayoutInflater(), listener, dataSource);
 
         RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -25,19 +27,15 @@ final class Presenter {
 
         recyclerView.addOnScrollListener(new PagingScrollListener(listener));
 
-        return new Presenter(dataSource, adapter);
+        return new Presenter<>(adapter);
     }
 
-    private Presenter(Posts dataSource, RecyclerView.Adapter adapter) {
-        this.dataSource = dataSource;
+    private Presenter(PostSummaryAdapter<T> adapter) {
         this.adapter = adapter;
     }
 
-    public void present(List<PostSummary> postSummaries) {
-        int previousSize = dataSource.size();
-
-        dataSource.set(postSummaries);
-        adapter.notifyItemRangeInserted(previousSize, postSummaries.size());
+    public void present(T dataSource) {
+        adapter.notifyDataSourceChanged(dataSource);
     }
 
     public interface Listener extends PagingListener {

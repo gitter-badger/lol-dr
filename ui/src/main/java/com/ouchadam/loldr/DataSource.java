@@ -13,15 +13,10 @@ public interface DataSource<T> {
             throw new IllegalAccessError("Tried to get some an empty datasource, tut tut");
         }
 
-        @Override
-        public void close() {
-            // do nothing
-        }
     };
 
     int size();
 
     T get(int position);
 
-    void close();
 }

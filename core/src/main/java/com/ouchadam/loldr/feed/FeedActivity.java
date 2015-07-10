@@ -12,6 +12,7 @@ import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
 import com.ouchadam.loldr.post.PostActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
@@ -21,16 +22,17 @@ import rx.schedulers.Schedulers;
 public class FeedActivity extends BaseActivity {
 
     private TokenAcquirer tokenAcquirer;
-    private Presenter presenter;
-    private MarshallerFactory marshallerFactory;
+    private Presenter<PostProvider.PostSummarySource> presenter;
+
     private String afterId;
+    private List<Data.Post> cachedPosts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.marshallerFactory = new MarshallerFactory();
         this.tokenAcquirer = TokenAcquirer.newInstance();
-        this.presenter = Presenter.onCreate(this, listener);
+        PostProvider postProvider = new PostProvider();
+        this.presenter = Presenter.onCreate(this, postProvider, listener);
 
         Repository.newInstance(provider).subreddit("askreddit")
                 .subscribeOn(Schedulers.io())
@@ -68,10 +70,12 @@ public class FeedActivity extends BaseActivity {
             @Override
             public void onNext(Data.Feed feed) {
                 FeedActivity.this.afterId = feed.afterId();
-                List<Data.Post> dataPosts = feed.getPosts();
-                List<PostSummary> uiPosts = marshallerFactory.posts().marshall(dataPosts);
+                cachedPosts.addAll(feed.getPosts());               // TODO replace this with a cursor
 
-                presenter.present(uiPosts);
+                List<PostSummary> summaries = new MarshallerFactory().posts().marshall(cachedPosts);
+
+                PostProvider.PostSummarySource dataSource = new PostProvider.PostSummarySource(summaries);
+                presenter.present(dataSource);
             }
         };
     }

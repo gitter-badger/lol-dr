@@ -31,9 +31,4 @@ class Posts implements DataSource<PostSummary> {
         return postSummaries.get(position);
     }
 
-    @Override
-    public void close() {
-        // do nothing for now!
-    }
-
 }

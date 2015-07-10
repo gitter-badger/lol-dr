@@ -6,16 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ouchadam.loldr.DataSource;
+import com.ouchadam.loldr.SourceProvider;
 import com.ouchadam.loldr.post.Presenter.Listener;
 
-class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
+class CommentAdapter<T extends DataSource<Comment>> extends RecyclerView.Adapter<CommentViewHolder> {
 
     private final LayoutInflater layoutInflater;
     private final Listener listener;
 
-    private DataSource<Comment> dataSource;
+    private SourceProvider<Comment, T> dataSource;
 
-    CommentAdapter(DataSource<Comment> dataSource, LayoutInflater layoutInflater, Listener listener) {
+    CommentAdapter(SourceProvider<Comment, T> dataSource, LayoutInflater layoutInflater, Listener listener) {
         this.dataSource = dataSource;
         this.layoutInflater = layoutInflater;
         this.listener = listener;
@@ -62,9 +63,8 @@ class CommentAdapter extends RecyclerView.Adapter<CommentViewHolder> {
         return dataSource.size();
     }
 
-    public void notifyDataSourceChanged(DataSource<Comment> dataSource) {
-        this.dataSource.close();
-        this.dataSource = dataSource;
+    public void notifyDataSourceChanged(T dataSource) {
+        this.dataSource.swap(dataSource);
         notifyDataSetChanged();
     }
 }
