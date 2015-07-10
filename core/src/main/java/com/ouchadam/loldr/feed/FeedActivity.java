@@ -74,8 +74,7 @@ public class FeedActivity extends BaseActivity {
 
                 List<PostSummary> summaries = new MarshallerFactory().posts().marshall(cachedPosts);
 
-                PostProvider.PostSummarySource dataSource = new PostProvider.PostSummarySource(summaries);
-                presenter.present(dataSource);
+                presenter.present(new PostProvider.PostSummarySource(summaries));
             }
         };
     }

@@ -71,4 +71,8 @@ final class Presenter<T extends DataSource<PostSummary>> {
 
     }
 
+    interface PostSourceProvider<T extends DataSource<PostSummary>> extends SourceProvider<PostSummary, T> {
+
+    }
+
 }

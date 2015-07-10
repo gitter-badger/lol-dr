@@ -1,15 +1,14 @@
 package com.ouchadam.loldr.post;
 
 import com.ouchadam.loldr.DataSource;
-import com.ouchadam.loldr.SourceProvider;
 import com.ouchadam.loldr.data.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentProvider implements SourceProvider<Comment, CommentProvider.CommentSource> {
+public class CommentProvider implements Presenter.CommentSourceProvider<CommentProvider.CommentSource> {
 
-    private CommentSource commentSource = new CommentSource();
+    private final CommentSource commentSource = new CommentSource();
 
     @Override
     public void swap(CommentSource source) {

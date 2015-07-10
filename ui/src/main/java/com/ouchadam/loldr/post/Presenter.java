@@ -36,4 +36,8 @@ public class Presenter<T extends DataSource<Comment>> {
         void onCommentClicked(Comment comment);
     }
 
+    interface CommentSourceProvider<T extends DataSource<Comment>> extends SourceProvider<Comment, T> {
+
+    }
+
 }

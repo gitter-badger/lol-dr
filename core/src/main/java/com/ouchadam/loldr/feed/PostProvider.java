@@ -1,14 +1,13 @@
 package com.ouchadam.loldr.feed;
 
 import com.ouchadam.loldr.DataSource;
-import com.ouchadam.loldr.SourceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostProvider implements SourceProvider<PostSummary, PostProvider.PostSummarySource> {
+public class PostProvider implements Presenter.PostSourceProvider<PostProvider.PostSummarySource> {
 
-    private PostSummarySource postSummarySource = new PostSummarySource();
+    private final PostSummarySource postSummarySource = new PostSummarySource();
 
     @Override
     public void swap(PostSummarySource source) {
