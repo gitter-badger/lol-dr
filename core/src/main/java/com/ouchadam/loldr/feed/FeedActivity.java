@@ -26,6 +26,7 @@ public class FeedActivity extends BaseActivity {
 
     private String afterId;
     private List<Data.Post> cachedPosts = new ArrayList<>();
+    private Repository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,9 @@ public class FeedActivity extends BaseActivity {
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
 
-        Repository.newInstance(provider).subreddit("askreddit")
+        repository = Repository.newInstance(provider);
+
+        repository.subreddit("askreddit")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(presentResult());
@@ -48,7 +51,7 @@ public class FeedActivity extends BaseActivity {
 
         @Override
         public void onNextPageRequest() {
-            Repository.newInstance(provider).subreddit("askreddit", afterId)
+            repository.subreddit("askreddit", afterId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(presentResult());
