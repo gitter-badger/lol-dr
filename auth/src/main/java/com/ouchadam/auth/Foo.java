@@ -3,7 +3,6 @@ package com.ouchadam.auth;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import com.squareup.okhttp.Credentials;
 import com.squareup.okhttp.MediaType;
@@ -65,7 +64,7 @@ class Foo {
                 new Observable.OnSubscribe<Token>() {
                     @Override
                     public void call(Subscriber<? super Token> subscriber) {
-                        String anonymousAccessToken;
+                        Token anonymousAccessToken;
                         try {
                             anonymousAccessToken = getAnonymousAccessToken();
                         } catch (IOException e) {
@@ -73,15 +72,14 @@ class Foo {
                             return;
                         }
 
-                        subscriber.onNext(new Token(anonymousAccessToken));
+                        subscriber.onNext(anonymousAccessToken);
                         subscriber.onCompleted();
                     }
                 }
         );
     }
 
-    private String getAnonymousAccessToken() throws IOException {
-        Log.e("!!!", "running");
+    private Token getAnonymousAccessToken() throws IOException {
         MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
         Request request = new Request.Builder()
                 .url("https://www.reddit.com/api/v1/access_token")
@@ -93,9 +91,15 @@ class Foo {
 
         String result = response.body().string();
 
+        return parseToken(result);
+    }
+
+    private Token parseToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
-            return jsonObject.getString("access_token");
+            String rawToken = jsonObject.getString("access_token");
+
+            return new Token(rawToken);
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
@@ -125,7 +129,7 @@ class Foo {
 
                     Response response = new OkHttpClient().newCall(request).execute();
 
-                    return new Token(response.body().string());
+                    return parseToken(response.body().toString());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

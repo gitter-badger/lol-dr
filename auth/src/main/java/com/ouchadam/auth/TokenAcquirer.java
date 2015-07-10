@@ -1,6 +1,7 @@
 package com.ouchadam.auth;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 
 import java.util.UUID;
 
@@ -9,18 +10,19 @@ import rx.Observable;
 public class TokenAcquirer {
 
     private final Foo foo;
+    private final TokenStorage tokenStorage;
 
     public static TokenAcquirer newInstance() {
         UUID deviceId = UUID.randomUUID();
-        return new TokenAcquirer(new Foo(deviceId));
+        return new TokenAcquirer(new Foo(deviceId), null);
     }
 
-    public TokenAcquirer(Foo foo) {
+    public TokenAcquirer(Foo foo, TokenStorage tokenStorage) {
         this.foo = foo;
+        this.tokenStorage = tokenStorage;
     }
 
     public Observable<Token> acquireToken(UserTokenRequest userTokenRequest) {
-        // TODO remove callback and become blocking
         if (storedTokenIsValid()) {
             return getStoredToken(userTokenRequest);
         } else if (hasStoredToken(userTokenRequest)){
@@ -31,6 +33,9 @@ public class TokenAcquirer {
     }
 
     private boolean storedTokenIsValid() {
+
+        Token token = tokenStorage.getToken();
+
         return false;
     }
 
@@ -56,6 +61,19 @@ public class TokenAcquirer {
 
     public void createUserToken(Activity activity) {
         foo.requestUserAuthentication(activity);
+    }
+
+    private static class TokenStorage {
+
+        private final SharedPreferences preferences;
+
+        private TokenStorage(SharedPreferences preferences) {
+            this.preferences = preferences;
+        }
+
+        public Token getToken() {
+            return null;
+        }
     }
 
 }
