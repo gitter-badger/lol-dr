@@ -21,4 +21,8 @@ public class DeserializerFactory {
         return gsonBuilder.registerTypeAdapter(Data.Comments.class, new PostDeserializer());
     }
 
+    private GsonBuilder subscriptions(GsonBuilder gsonBuilder) {
+        return gsonBuilder.registerTypeAdapter(Data.Comments.class, new SubscriptionsDeserializer());
+    }
+
 }
