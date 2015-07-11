@@ -4,4 +4,9 @@
   <string name="label_activity_post">lol;dr Post</string>
   <string name="label_activity_feed">lol;dr Feed</string>
   <string name="label_launcher_entry">@string/app_name</string>
+
+  <string name="post_summary_age_minutes">%1$dm ago</string>
+  <string name="post_summary_age_days">%1$dd ago</string>
+  <string name="post_summary_age_hours">%1$dh ago</string>
+  <string name="post_summary_age_years">%1$dy ago</string>
 </resources>

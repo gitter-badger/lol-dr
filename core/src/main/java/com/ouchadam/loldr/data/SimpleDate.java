@@ -20,6 +20,10 @@ public final class SimpleDate {
         this.date = date;
     }
 
+    public long differenceFromNowInMillis() {
+        return date.getTime() - System.currentTimeMillis();
+    }
+
     @Override
     public String toString() {
         return NAMED_DAY_MONTH_DAY_YEAR.format(date);

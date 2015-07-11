@@ -1,12 +1,27 @@
 package com.ouchadam.loldr.feed;
 
+import android.content.res.Resources;
+
 import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
+import com.ouchadam.loldr.data.SimpleDate;
+import com.ouchadam.loldr.post.PostSummarySimpleDateFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class MarshallerFactory {
+
+    private final PostSummarySimpleDateFormatter postSummarySimpleDateFormatter;
+
+    static MarshallerFactory newInstance(Resources resources) {
+        PostSummarySimpleDateFormatter postSummarySimpleDateFormatter = PostSummarySimpleDateFormatter.newInstance(resources);
+        return new MarshallerFactory(postSummarySimpleDateFormatter);
+    }
+
+    MarshallerFactory(PostSummarySimpleDateFormatter postSummarySimpleDateFormatter) {
+        this.postSummarySimpleDateFormatter = postSummarySimpleDateFormatter;
+    }
 
     public Marshaller<List<Ui.PostSummary>, List<Data.Post>> posts() {
        return marshallList(post());
@@ -42,7 +57,8 @@ class MarshallerFactory {
 
                     @Override
                     public String getTime() {
-                        return from.getCreatedDate().toString();
+                        SimpleDate date = SimpleDate.from(from.getCreatedDate());
+                        return postSummarySimpleDateFormatter.format(date);
                     }
 
                     @Override
