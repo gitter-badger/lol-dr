@@ -1,6 +1,6 @@
 package com.ouchadam.auth;
 
-public class AnonToken implements Token {
+class AnonToken implements Token {
 
     private final String accessToken;
     private final long expiryTime;
