@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.feed.FeedActivity;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -52,6 +53,12 @@ public class DebugActivity extends BaseActivity {
                             Toast.makeText(DebugActivity.this, token.getRawToken(), Toast.LENGTH_LONG).show();
                         }
                     });
+        }
+
+        @Override
+        public void onClickNavigateToFeed() {
+            startActivity(new Intent(DebugActivity.this, FeedActivity.class));
+            finish();
         }
     };
 

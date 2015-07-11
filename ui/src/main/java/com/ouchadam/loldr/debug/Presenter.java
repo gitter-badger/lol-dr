@@ -25,6 +25,13 @@ public class Presenter {
             }
         });
 
+        activity.findViewById(R.id.button_to_feed).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onClickNavigateToFeed();
+            }
+        });
+
         Toast.makeText(activity, "Hello world", Toast.LENGTH_SHORT).show();
 
         return new Presenter();
@@ -33,5 +40,6 @@ public class Presenter {
     public interface Listener {
         void onClickUserToken();
         void onClickAnonToken();
+        void onClickNavigateToFeed();
     }
 }
