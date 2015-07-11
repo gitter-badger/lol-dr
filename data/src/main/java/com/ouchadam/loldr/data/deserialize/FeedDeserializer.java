@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.ouchadam.loldr.data.Data;
+import com.ouchadam.loldr.data.SimpleDate;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ class FeedDeserializer implements JsonDeserializer<Data.Feed> {
                     postJson.get("subreddit").getAsString(),
                     postJson.get("ups").getAsInt(),
                     postJson.get("num_comments").getAsInt(),
-                    postJson.get("created_utc").getAsLong()
+                    SimpleDate.from(postJson.get("created_utc").getAsLong())
             );
 
             posts.add(post);
@@ -47,9 +48,9 @@ class FeedDeserializer implements JsonDeserializer<Data.Feed> {
         private final String subreddit;
         private final int ups;
         private final int commentCount;
-        private final long createdUtcTimeStamp;
+        private final SimpleDate createdUtcTimeStamp;
 
-        public Post(String id, String title, String subreddit, int ups, int commentCount, long createdUtcTimeStamp) {
+        public Post(String id, String title, String subreddit, int ups, int commentCount, SimpleDate createdUtcTimeStamp) {
             this.id = id;
             this.title = title;
             this.subreddit = subreddit;
@@ -84,7 +85,7 @@ class FeedDeserializer implements JsonDeserializer<Data.Feed> {
         }
 
         @Override
-        public long getCreatedUtcTimeStamp() {
+        public SimpleDate getCreatedDate() {
             return createdUtcTimeStamp;
         }
     }

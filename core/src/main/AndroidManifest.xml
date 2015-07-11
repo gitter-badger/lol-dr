@@ -7,13 +7,9 @@
     android:icon="@mipmap/ic_launcher"
     android:theme="@style/AppTheme">
 
-    <activity android:name="com.ouchadam.loldr.main.MainActivity" />
-
-    <activity android:name="com.ouchadam.loldr.feed.FeedActivity">
-      <intent-filter android:label="loldr feed">
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
+    <activity
+      android:name="com.ouchadam.loldr.feed.FeedActivity"
+      android:label="@string/label_activity_feed">
       <intent-filter>
         <action android:name="${applicationId}.FEED" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -21,16 +17,23 @@
     </activity>
 
     <activity android:name="com.ouchadam.loldr.post.PostActivity">
-      <intent-filter android:label="loldr post">
+      <intent-filter android:label="@string/label_activity_post">
         <action android:name="${applicationId}.POST" />
         <category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
     </activity>
 
+    <activity android:name="com.ouchadam.loldr.debug.DebugActivity">
+      <intent-filter android:label="@string/label_activity_debug">
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+
     <activity-alias
       android:name="launcher_activity"
-      android:label="@string/app_name"
-      android:targetActivity="com.ouchadam.loldr.main.MainActivity">
+      android:label="@string/label_launcher_entry"
+      android:targetActivity="com.ouchadam.loldr.feed.FeedActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
