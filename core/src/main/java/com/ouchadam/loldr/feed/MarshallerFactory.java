@@ -42,7 +42,7 @@ class MarshallerFactory {
 
                     @Override
                     public String getTime() {
-                        return String.valueOf(from.getCreatedUtcTimeStamp());
+                        return from.getCreatedDate().toString();
                     }
 
                     @Override
