@@ -16,9 +16,12 @@ final class Presenter<T extends DataSource<Ui.PostSummary>> {
     static <T extends DataSource<Ui.PostSummary>> Presenter<T> onCreate(
             Activity activity,
             SourceProvider<Ui.PostSummary, T> dataSource,
+            String subreddit,
             Listener listener) {
 
         activity.setContentView(R.layout.activity_feed);
+
+        activity.setTitle(subreddit);
 
         PostSummaryAdapter<T> adapter = new PostSummaryAdapter<>(activity.getLayoutInflater(), listener, dataSource);
 
