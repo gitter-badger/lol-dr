@@ -50,7 +50,7 @@ public class DebugActivity extends BaseActivity {
 
                         @Override
                         public void onNext(Token token) {
-                            Toast.makeText(DebugActivity.this, token.getRawToken(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(DebugActivity.this, token.getAccessToken(), Toast.LENGTH_LONG).show();
                         }
                     });
         }

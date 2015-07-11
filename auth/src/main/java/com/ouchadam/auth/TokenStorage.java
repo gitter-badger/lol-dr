@@ -19,35 +19,35 @@ class TokenStorage {
         this.preferences = preferences;
     }
 
-    public Token getToken(String userName) {
+    public AccessToken getToken(String userName) {
         if (preferences.contains(userName)) {
-            return new Token(
+            return new AccessToken(
                     preferences.getString(userName + RAW, ""),
                     preferences.getString(userName + REFRESH, ""),
                     preferences.getInt(userName + EXPIRY, -1),
                     preferences.getLong(userName + TIMESTAMP, -1)
             );
         } else {
-            return Token.MISSING;
+            return AccessToken.MISSING;
         }
     }
 
-    public void storeToken(String userName, Token token) {
+    public void storeToken(String userName, AccessToken accessToken) {
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString("currentUser", userName);
 
         editor.putBoolean(userName, true);
-        editor.putString(userName + RAW, token.getRawToken());
-        editor.putString(userName + REFRESH, token.getRefreshToken());
-        editor.putInt(userName + EXPIRY, token.getExpiry());
-        editor.putLong(userName + TIMESTAMP, token.getTimeStamp());
+        editor.putString(userName + RAW, accessToken.getRawToken());
+        editor.putString(userName + REFRESH, accessToken.getRefreshToken());
+        editor.putInt(userName + EXPIRY, accessToken.getExpiry());
+        editor.putLong(userName + TIMESTAMP, accessToken.getTimeStamp());
 
         editor.apply();
     }
 
-    public Token getCurrentUserToken() {
-        Token currentUser = getToken(preferences.getString("currentUser", null));
-        return currentUser == null ? Token.MISSING : currentUser;
+    public AccessToken getCurrentUserToken() {
+        AccessToken currentUser = getToken(preferences.getString("currentUser", null));
+        return currentUser == null ? AccessToken.MISSING : currentUser;
     }
 }

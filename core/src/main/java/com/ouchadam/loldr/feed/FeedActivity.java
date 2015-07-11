@@ -75,7 +75,7 @@ public class FeedActivity extends BaseActivity {
         @Override
         public TokenProvider.AccessToken provideAccessToken() {
             Token token = tokenAcquirer.acquireToken().toBlocking().first();
-            return new TokenProvider.AccessToken(token.getRawToken());
+            return new TokenProvider.AccessToken(token.getAccessToken());
         }
     };
 

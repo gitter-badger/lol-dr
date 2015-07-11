@@ -1,5 +1,6 @@
 package com.ouchadam.auth;
 
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.util.Pair;
@@ -15,6 +16,10 @@ public class TokenAcquirer {
     private final Foo foo;
     private final TokenStorage tokenStorage;
 
+
+
+    private AccountManager accountManager;
+
     public static TokenAcquirer newInstance(Context context) {
         UUID deviceId = UUID.randomUUID();
         return new TokenAcquirer(new Foo(deviceId), TokenStorage.from(context));
@@ -26,37 +31,36 @@ public class TokenAcquirer {
     }
 
     public Observable<Token> acquireToken() {
-        Token token = tokenStorage.getCurrentUserToken();
+        AccessToken accessToken = tokenStorage.getCurrentUserToken();
 
-        if (token.isMissing() || (token.isAnon() && token.hasExpired())) {
+        if (accessToken.isMissing() || (accessToken.isAnon() && accessToken.hasExpired())) {
             return foo.requestAnonymousAccessToken().map(saveAnonToken());
         }
 
-        return token.hasExpired() ? foo.refreshToken(token) : Observable.just(token);
+        return accessToken.hasExpired() ? foo.refreshToken(accessToken) : Observable.<Token>just(accessToken);
     }
 
     public void createUserToken(Activity activity) {
         foo.requestUserAuthentication(activity);
     }
 
-    public Observable<Token> requestNewToken(String oauthRedirect) {
+    public Observable<AccessToken> requestNewToken(String oauthRedirect) {
        return foo.requestUserToken(oauthRedirect).map(fetchUserName()).map(saveUserToken());
     }
 
-
-    private Func1<Token, Pair<Token, String>> fetchUserName() {
-        return new Func1<Token, Pair<Token, String>>() {
+    private Func1<AccessToken, Pair<AccessToken, String>> fetchUserName() {
+        return new Func1<AccessToken, Pair<AccessToken, String>>() {
             @Override
-            public Pair<Token, String> call(Token token) {
-                return Pair.create(token, new UserFetcher().fetchUserName(token));
+            public Pair<AccessToken, String> call(AccessToken accessToken) {
+                return Pair.create(accessToken, new UserFetcher().fetchUserName(accessToken));
             }
         };
     }
 
-    private Func1<Pair<Token, String>, Token> saveUserToken() {
-        return new Func1<Pair<Token, String>, Token>() {
+    private Func1<Pair<AccessToken, String>, AccessToken> saveUserToken() {
+        return new Func1<Pair<AccessToken, String>, AccessToken>() {
             @Override
-            public Token call(Pair<Token, String> input) {
+            public AccessToken call(Pair<AccessToken, String> input) {
                 Log.e("!!!", " saving token");
                 tokenStorage.storeToken(input.second, input.first);
                 return input.first;
@@ -64,10 +68,10 @@ public class TokenAcquirer {
         };
     }
 
-    private Func1<Token, Token> saveAnonToken() {
-        return new Func1<Token, Token>() {
+    private Func1<AccessToken, Token> saveAnonToken() {
+        return new Func1<AccessToken, Token>() {
             @Override
-            public Token call(Token input) {
+            public AccessToken call(AccessToken input) {
                 Log.e("!!!", " saving token");
                 tokenStorage.storeToken("anon", input);
                 return input;

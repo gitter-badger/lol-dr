@@ -60,27 +60,27 @@ class Foo {
         activity.startActivityForResult(intent, 100);
     }
 
-    public Observable<Token> requestAnonymousAccessToken() {
+    public Observable<AccessToken> requestAnonymousAccessToken() {
         return Observable.create(
-                new Observable.OnSubscribe<Token>() {
+                new Observable.OnSubscribe<AccessToken>() {
                     @Override
-                    public void call(Subscriber<? super Token> subscriber) {
-                        Token anonymousAccessToken;
+                    public void call(Subscriber<? super AccessToken> subscriber) {
+                        AccessToken anonymousAccessAccessToken;
                         try {
-                            anonymousAccessToken = getAnonymousAccessToken();
+                            anonymousAccessAccessToken = getAnonymousAccessToken();
                         } catch (IOException e) {
                             subscriber.onError(e);
                             return;
                         }
 
-                        subscriber.onNext(anonymousAccessToken);
+                        subscriber.onNext(anonymousAccessAccessToken);
                         subscriber.onCompleted();
                     }
                 }
         );
     }
 
-    private Token getAnonymousAccessToken() throws IOException {
+    private AccessToken getAnonymousAccessToken() throws IOException {
         MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
         Request request = new Request.Builder()
                 .url("https://www.reddit.com/api/v1/access_token")
@@ -95,7 +95,7 @@ class Foo {
         return parseAnonToken(result);
     }
 
-    private Token parseUserToken(String result) {
+    private AccessToken parseUserToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
@@ -108,33 +108,33 @@ class Foo {
             }
 
             int expiryInSeconds = jsonObject.getInt("expires_in");
-            return new Token(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
+            return new AccessToken(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
     }
 
-    private Token parseAnonToken(String result) {
+    private AccessToken parseAnonToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
             int expiryInSeconds = jsonObject.getInt("expires_in");
 
-            return Token.anon(rawToken, expiryInSeconds, System.currentTimeMillis());
+            return AccessToken.anon(rawToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
     }
 
-    public Observable<Token> requestUserToken(String redirectUrl) {
+    public Observable<AccessToken> requestUserToken(String redirectUrl) {
         return Observable.just(redirectUrl)
                 .map(getAccessToken());
     }
 
-    private Func1<String, Token> getAccessToken() {
-        return new Func1<String, Token>() {
+    private Func1<String, AccessToken> getAccessToken() {
+        return new Func1<String, AccessToken>() {
             @Override
-            public Token call(String redirectUrl) {
+            public AccessToken call(String redirectUrl) {
                 Map<String, List<String>> queryParams = getQueryParams(redirectUrl);
 
                 try {
@@ -190,17 +190,17 @@ class Foo {
         }
     }
 
-    public Observable<Token> refreshToken(Token token) {
-        return Observable.just(token).map(new Func1<Token, Token>() {
+    public Observable<Token> refreshToken(AccessToken accessToken) {
+        return Observable.just(accessToken).map(new Func1<AccessToken, Token>() {
             @Override
-            public Token call(Token token) {
+            public Token call(AccessToken accessToken) {
                 Log.e("!!!", " refreshing token");
 
                 try {
                     MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
                     Request request = new Request.Builder()
                             .url("https://www.reddit.com/api/v1/access_token")
-                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + token.getRefreshToken()))
+                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + accessToken.getRefreshToken()))
                             .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
                             .build();
 

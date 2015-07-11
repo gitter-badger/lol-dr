@@ -45,7 +45,7 @@ public class OAuthWebViewActivity extends Activity {
         TokenAcquirer.newInstance(OAuthWebViewActivity.this).requestNewToken(redirectUrl)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Token>() {
+                .subscribe(new Subscriber<AccessToken>() {
                     @Override
                     public void onCompleted() {
 
@@ -57,9 +57,9 @@ public class OAuthWebViewActivity extends Activity {
                     }
 
                     @Override
-                    public void onNext(Token token) {
+                    public void onNext(AccessToken accessToken) {
                         Intent data = new Intent();
-                        data.putExtra("data", token.getRawToken());
+                        data.putExtra("data", accessToken.getRawToken());
                         setResult(RESULT_OK, data);
                         finish();
                     }
