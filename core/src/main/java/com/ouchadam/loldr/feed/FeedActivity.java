@@ -38,6 +38,7 @@ public class FeedActivity extends BaseActivity {
     private Repository repository;
 
     private String subreddit;
+    private DrawerPresenter<SubscriptionProvider.SubscriptionSource> drawerPresenter;
 
     public Intent create(String subreddit) {
         Intent intent = new Intent("action");
@@ -52,55 +53,28 @@ public class FeedActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.subreddit = getSubreddit();
         this.tokenAcquirer = TokenAcquirer.newInstance(this);
+        this.repository = Repository.newInstance(tokenProvider);
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
-
-        final DrawerPresenter<SubscriptionProvider.SubscriptionSource> drawerPresenter = new DrawerPresenter((NavigationView) findViewById(R.id.navigation_view));
-
-        this.repository = Repository.newInstance(provider);
-        this.subreddit = getSubreddit();
+        this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view));
 
         executor.execute(repository.subreddit(subreddit), presentResult());
-        executor.execute(repository.defaultSubscriptions(), new Subscriber<Data.Subscriptions>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Data.Subscriptions subscriptions) {
-
-                List<Ui.Subscription> uiSubscriptions = new ArrayList<>();
-
-                for (final Data.Subreddit subreddit : subscriptions.getSubscribedSubreddits()) {
-                    uiSubscriptions.add(new Ui.Subscription() {
-                        @Override
-                        public String getId() {
-                            return subreddit.getId();
-                        }
-
-                        @Override
-                        public String getName() {
-                            return subreddit.getName();
-                        }
-                    });
-                }
-
-                drawerPresenter.present(new SubscriptionProvider.SubscriptionSource(uiSubscriptions));
-            }
-        });
-
+        executor.execute(repository.defaultSubscriptions(), updateDrawer());
     }
 
     private String getSubreddit() {
         return getIntent().hasExtra(EXTRA_SUBREDDIT) ? getIntent().getStringExtra(EXTRA_SUBREDDIT) : DEFAULT_SUBREDDIT;
     }
+
+    private TokenProvider tokenProvider = new TokenProvider() {
+        @Override
+        public TokenProvider.AccessToken provideAccessToken() {
+            Token token = tokenAcquirer.acquireToken().toBlocking().first();
+            return new TokenProvider.AccessToken(token.getRawToken());
+        }
+    };
 
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
@@ -138,12 +112,38 @@ public class FeedActivity extends BaseActivity {
         };
     }
 
-    private TokenProvider provider = new TokenProvider() {
-        @Override
-        public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken().toBlocking().first();
-            return new TokenProvider.AccessToken(token.getRawToken());
-        }
-    };
+    private Subscriber<Data.Subscriptions> updateDrawer() {
+        return new Subscriber<Data.Subscriptions>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Data.Subscriptions subscriptions) {
+                List<Ui.Subscription> uiSubscriptions = new ArrayList<>();
+                for (final Data.Subreddit subreddit : subscriptions.getSubscribedSubreddits()) {
+                    uiSubscriptions.add(new Ui.Subscription() {
+                        @Override
+                        public String getId() {
+                            return subreddit.getId();
+                        }
+
+                        @Override
+                        public String getName() {
+                            return subreddit.getName();
+                        }
+                    });
+                }
+
+                drawerPresenter.present(new SubscriptionProvider.SubscriptionSource(uiSubscriptions));
+            }
+        };
+    }
 
 }
