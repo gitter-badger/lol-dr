@@ -10,6 +10,7 @@ public class DeserializerFactory {
         GsonBuilder gsonBuilder = new GsonBuilder();
         feed(gsonBuilder);
         comments(gsonBuilder);
+        subscriptions(gsonBuilder);
         return gsonBuilder.create();
     }
 
@@ -19,6 +20,10 @@ public class DeserializerFactory {
 
     private GsonBuilder comments(GsonBuilder gsonBuilder) {
         return gsonBuilder.registerTypeAdapter(Data.Comments.class, new PostDeserializer());
+    }
+
+    private GsonBuilder subscriptions(GsonBuilder gsonBuilder) {
+        return gsonBuilder.registerTypeAdapter(Data.Subscriptions.class, new SubscriptionsDeserializer());
     }
 
 }

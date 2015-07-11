@@ -2,16 +2,21 @@ package com.ouchadam.loldr.feed;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.util.Log;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.Executor;
+import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
+import com.ouchadam.loldr.drawer.DrawerPresenter;
+import com.ouchadam.loldr.drawer.SubscriptionProvider;
 import com.ouchadam.loldr.post.PostActivity;
 
 import java.util.ArrayList;
@@ -20,6 +25,8 @@ import java.util.List;
 import rx.Subscriber;
 
 public class FeedActivity extends BaseActivity {
+
+    private static final String ACTION = BuildConfig.APPLICATION_ID + ".FEED";
 
     private static final String EXTRA_SUBREDDIT = "subreddit";
     private static final String DEFAULT_SUBREDDIT = "askreddit";
@@ -34,9 +41,10 @@ public class FeedActivity extends BaseActivity {
     private Repository repository;
 
     private String subreddit;
+    private DrawerPresenter<SubscriptionProvider.SubscriptionSource> drawerPresenter;
 
-    public Intent create(String subreddit) {
-        Intent intent = new Intent("action");
+    public static Intent create(String subreddit) {
+        Intent intent = new Intent(ACTION);
         intent.putExtra(EXTRA_SUBREDDIT, subreddit);
         return intent;
     }
@@ -48,20 +56,28 @@ public class FeedActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.subreddit = getSubreddit();
         this.tokenAcquirer = TokenAcquirer.newInstance(this);
+        this.repository = Repository.newInstance(tokenProvider);
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
-
-        this.repository = Repository.newInstance(provider);
-
-        this.subreddit = getSubreddit();
+        this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view), drawerListener, new SubscriptionProvider());
 
         executor.execute(repository.subreddit(subreddit), presentResult());
+        executor.execute(repository.defaultSubscriptions(), updateDrawer());
     }
 
     private String getSubreddit() {
         return getIntent().hasExtra(EXTRA_SUBREDDIT) ? getIntent().getStringExtra(EXTRA_SUBREDDIT) : DEFAULT_SUBREDDIT;
     }
+
+    private TokenProvider tokenProvider = new TokenProvider() {
+        @Override
+        public TokenProvider.AccessToken provideAccessToken() {
+            Token token = tokenAcquirer.acquireToken().toBlocking().first();
+            return new TokenProvider.AccessToken(token.getRawToken());
+        }
+    };
 
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
@@ -99,11 +115,44 @@ public class FeedActivity extends BaseActivity {
         };
     }
 
-    private TokenProvider provider = new TokenProvider() {
+    private Subscriber<Data.Subscriptions> updateDrawer() {
+        return new Subscriber<Data.Subscriptions>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Data.Subscriptions subscriptions) {
+                List<Ui.Subscription> uiSubscriptions = new ArrayList<>();
+                for (final Data.Subreddit subreddit : subscriptions.getSubscribedSubreddits()) {
+                    uiSubscriptions.add(new Ui.Subscription() {
+                        @Override
+                        public String getId() {
+                            return subreddit.getId();
+                        }
+
+                        @Override
+                        public String getName() {
+                            return subreddit.getName();
+                        }
+                    });
+                }
+
+                drawerPresenter.present(new SubscriptionProvider.SubscriptionSource(uiSubscriptions));
+            }
+        };
+    }
+
+    private final DrawerPresenter.Listener drawerListener = new DrawerPresenter.Listener() {
         @Override
-        public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken().toBlocking().first();
-            return new TokenProvider.AccessToken(token.getRawToken());
+        public void onSubscriptionClicked(Ui.Subscription subscription) {
+            startActivity(FeedActivity.create(subscription.getName()));
         }
     };
 

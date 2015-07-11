@@ -52,6 +52,10 @@ public class Repository {
         return api.getComments(subredditName, postId);
     }
 
+    public Observable<Data.Subscriptions> defaultSubscriptions() {
+        return api.getDefaultSubscriptions();
+    }
+
     interface Api {
         @GET("/api/v1/me")
         Observable<Data.Feed> getMe();
@@ -67,6 +71,12 @@ public class Repository {
 
         @GET("/")
         Observable<Data.Feed> getFrontPage(@Query("limit") int limit);
+
+        @GET("/subreddits/mine?limit=100&where=subscriber")
+        Observable<Data.Subscriptions> getUserSubscriptions();
+
+        @GET("/subreddits/default?limit=100")
+        Observable<Data.Subscriptions> getDefaultSubscriptions();
 
     }
 

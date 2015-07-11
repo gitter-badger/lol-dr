@@ -33,4 +33,12 @@ public final class Ui {
         boolean isMore();
 
     }
+
+    public interface Subscription {
+
+        String getId();
+
+        String getName();
+
+    }
 }

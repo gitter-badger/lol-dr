@@ -44,7 +44,7 @@ class Foo {
         String responseType = "code";
         String requestId = "RANDOM_STRING";
         String duration = "permanent";
-        String scope = "read,identity";
+        String scope = "read,identity,mysubreddits";
 
         Intent intent = new Intent(activity, OAuthWebViewActivity.class);
         intent.setData(

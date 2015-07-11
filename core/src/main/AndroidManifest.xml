@@ -9,7 +9,12 @@
 
     <activity
       android:name="com.ouchadam.loldr.feed.FeedActivity"
-      android:label="@string/label_activity_feed" />
+      android:label="@string/label_activity_feed">
+      <intent-filter>
+        <action android:name="${applicationId}.FEED" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
 
     <activity android:name="com.ouchadam.loldr.post.PostActivity">
       <intent-filter android:label="@string/label_activity_post">
