@@ -20,7 +20,7 @@ public final class Data {
 
         int getCommentCount();
 
-        long getCreatedUtcTimeStamp();
+        SimpleDate getCreatedDate();
 
     }
 
