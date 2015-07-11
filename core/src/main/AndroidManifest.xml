@@ -7,8 +7,8 @@
     android:icon="@mipmap/ic_launcher"
     android:theme="@style/AppTheme">
 
-    <activity android:name="com.ouchadam.loldr.main.MainActivity">
-      <intent-filter android:label="@string/label_activity_main">
+    <activity android:name="com.ouchadam.loldr.debug.DebugActivity">
+      <intent-filter android:label="@string/label_activity_debug">
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
