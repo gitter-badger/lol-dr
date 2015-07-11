@@ -50,4 +50,18 @@ public final class Data {
         List<Data.Comment> getComments();
 
     }
+
+    public interface Subscriptions {
+
+        List<Subreddit> getSubscribedSubreddits();
+
+    }
+
+    public interface Subreddit {
+
+        String getId();
+
+        String getName();
+
+    }
 }
