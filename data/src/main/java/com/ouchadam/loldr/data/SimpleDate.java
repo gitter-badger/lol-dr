@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public final class SimpleDate {
 
-    private static final SimpleDateFormat NAMED_DAY_MONTH_DAY_YEAR = new SimpleDateFormat("H:m EEE d MMMM yyyy", Locale.UK);
+    private static final SimpleDateFormat NAMED_DAY_MONTH_DAY_YEAR = new SimpleDateFormat("HH:mm EEE d MMMM yyyy", Locale.UK);
 
     private final Date date;
 
