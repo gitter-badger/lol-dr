@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
-import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.data.Data;
@@ -73,7 +72,7 @@ public class PostActivity extends BaseActivity {
     private TokenProvider provider = new TokenProvider() {
         @Override
         public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken(UserTokenRequest.anon()).toBlocking().first();
+            Token token = tokenAcquirer.acquireToken().toBlocking().first();
             return new TokenProvider.AccessToken(token.getRawToken());
         }
     };

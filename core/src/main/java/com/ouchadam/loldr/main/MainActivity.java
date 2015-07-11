@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
-import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
 
 import rx.Subscriber;
@@ -35,7 +34,7 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onClickAnonToken() {
-            tokenAcquirer.acquireToken(UserTokenRequest.anon())
+            tokenAcquirer.acquireToken()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<Token>() {

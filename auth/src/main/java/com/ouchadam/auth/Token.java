@@ -4,15 +4,17 @@ import java.util.concurrent.TimeUnit;
 
 public class Token {
 
-    static final Token MISSING = new Token("missing", -1, -1L);
+    static final Token MISSING = new Token("missing", "missing", -1, -1L);
     private static final int EXPIRY_BUFFER = 10000;
 
     private final String rawToken;
+    private final String refreshToken;
     private final int expiryInSeconds;
     private final long acquiredAtTimeStamp;
 
-    public Token(String rawToken, int expiryInSeconds, long acquiredAtTimeStamp) {
+    public Token(String rawToken, String refreshToken, int expiryInSeconds, long acquiredAtTimeStamp) {
         this.rawToken = rawToken;
+        this.refreshToken = refreshToken;
         this.expiryInSeconds = expiryInSeconds;
         this.acquiredAtTimeStamp = acquiredAtTimeStamp;
     }
@@ -36,4 +38,9 @@ public class Token {
     public long getTimeStamp() {
         return acquiredAtTimeStamp;
     }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
 }

@@ -44,7 +44,7 @@ class Foo {
         String responseType = "code";
         String requestId = "RANDOM_STRING";
         String duration = "permanent";
-        String scope = "read";
+        String scope = "read,identity";
 
         Intent intent = new Intent(activity, OAuthWebViewActivity.class);
         intent.setData(
@@ -99,8 +99,16 @@ class Foo {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
+
+            String refreshToken;
+            if (jsonObject.has("refresh_token")) {
+                refreshToken = jsonObject.getString("refresh_token");
+            } else {
+                refreshToken = "none!";
+            }
+
             int expiryInSeconds = jsonObject.getInt("expires_in");
-            return new Token(rawToken, expiryInSeconds, System.currentTimeMillis());
+            return new Token(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
@@ -174,17 +182,21 @@ class Foo {
         return Observable.just(token).map(new Func1<Token, Token>() {
             @Override
             public Token call(Token token) {
+                Log.e("!!!", " refreshing token");
+
                 try {
                     MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
                     Request request = new Request.Builder()
                             .url("https://www.reddit.com/api/v1/access_token")
-                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + token.getRawToken()))
+                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + token.getRefreshToken()))
                             .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
                             .build();
 
                     Response response = new OkHttpClient().newCall(request).execute();
 
                     String result = response.body().string();
+
+                    Log.e("!!!", result);
 
                     return parseToken(result);
                 } catch (Exception e) {
