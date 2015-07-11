@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.data.Repository;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;

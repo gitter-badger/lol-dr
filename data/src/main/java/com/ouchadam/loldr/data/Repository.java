@@ -52,6 +52,10 @@ public class Repository {
         return api.getComments(subredditName, postId);
     }
 
+    public Observable<Data.Subscriptions> defaultSubscriptions() {
+        return api.getDefaultSubscriptions();
+    }
+
     interface Api {
         @GET("/api/v1/me")
         Observable<Data.Feed> getMe();

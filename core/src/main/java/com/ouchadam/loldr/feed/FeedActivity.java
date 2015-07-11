@@ -53,7 +53,6 @@ public class FeedActivity extends BaseActivity {
         this.presenter = Presenter.onCreate(this, postProvider, listener);
 
         this.repository = Repository.newInstance(provider);
-
         this.subreddit = getSubreddit();
 
         executor.execute(repository.subreddit(subreddit), presentResult());

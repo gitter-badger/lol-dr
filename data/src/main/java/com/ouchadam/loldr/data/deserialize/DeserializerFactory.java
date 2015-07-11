@@ -23,7 +23,7 @@ public class DeserializerFactory {
     }
 
     private GsonBuilder subscriptions(GsonBuilder gsonBuilder) {
-        return gsonBuilder.registerTypeAdapter(Data.Comments.class, new SubscriptionsDeserializer());
+        return gsonBuilder.registerTypeAdapter(Data.Subscriptions.class, new SubscriptionsDeserializer());
     }
 
 }
