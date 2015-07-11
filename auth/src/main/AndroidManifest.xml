@@ -5,7 +5,18 @@
 
   <application>
 
-    <activity android:name=".OAuthWebViewActivity" />
+    <activity android:name=".OAuthSignInActivity" />
+
+    <service
+      android:name=".AccountService"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.accounts.AccountAuthenticator" />
+      </intent-filter>
+      <meta-data
+        android:name="android.accounts.AccountAuthenticator"
+        android:resource="@xml/authenticator" />
+    </service>
 
   </application>
 

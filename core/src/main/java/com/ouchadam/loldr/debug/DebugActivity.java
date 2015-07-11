@@ -29,12 +29,12 @@ public class DebugActivity extends BaseActivity {
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
         public void onClickUserToken() {
-            tokenAcquirer.createUserToken(DebugActivity.this);
+            // TODO use the account manager!
         }
 
         @Override
         public void onClickAnonToken() {
-            tokenAcquirer.acquireToken()
+            tokenAcquirer.acquireToken(null)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<Token>() {

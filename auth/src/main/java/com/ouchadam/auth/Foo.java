@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +47,7 @@ class Foo {
         String duration = "permanent";
         String scope = "read,identity,mysubreddits";
 
-        Intent intent = new Intent(activity, OAuthWebViewActivity.class);
+        Intent intent = new Intent(activity, OAuthSignInActivity.class);
         intent.setData(
                 Uri.parse(
                         BASE_URL
@@ -60,27 +61,27 @@ class Foo {
         activity.startActivityForResult(intent, 100);
     }
 
-    public Observable<AccessToken> requestAnonymousAccessToken() {
+    public Observable<AnonToken> requestAnonymousAccessToken() {
         return Observable.create(
-                new Observable.OnSubscribe<AccessToken>() {
+                new Observable.OnSubscribe<AnonToken>() {
                     @Override
-                    public void call(Subscriber<? super AccessToken> subscriber) {
-                        AccessToken anonymousAccessAccessToken;
+                    public void call(Subscriber<? super AnonToken> subscriber) {
+                        AnonToken anonymousAccessTokenResponse;
                         try {
-                            anonymousAccessAccessToken = getAnonymousAccessToken();
+                            anonymousAccessTokenResponse = getAnonymousAccessToken();
                         } catch (IOException e) {
                             subscriber.onError(e);
                             return;
                         }
 
-                        subscriber.onNext(anonymousAccessAccessToken);
+                        subscriber.onNext(anonymousAccessTokenResponse);
                         subscriber.onCompleted();
                     }
                 }
         );
     }
 
-    private AccessToken getAnonymousAccessToken() throws IOException {
+    private AnonToken getAnonymousAccessToken() throws IOException {
         MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
         Request request = new Request.Builder()
                 .url("https://www.reddit.com/api/v1/access_token")
@@ -95,7 +96,7 @@ class Foo {
         return parseAnonToken(result);
     }
 
-    private AccessToken parseUserToken(String result) {
+    private TokenResponse parseUserToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
@@ -108,33 +109,33 @@ class Foo {
             }
 
             int expiryInSeconds = jsonObject.getInt("expires_in");
-            return new AccessToken(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
+            return new TokenResponse(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
     }
 
-    private AccessToken parseAnonToken(String result) {
+    private AnonToken parseAnonToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
             int expiryInSeconds = jsonObject.getInt("expires_in");
 
-            return AccessToken.anon(rawToken, expiryInSeconds, System.currentTimeMillis());
+            return new AnonToken(rawToken, TimeUnit.SECONDS.toMillis(expiryInSeconds) + System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
     }
 
-    public Observable<AccessToken> requestUserToken(String redirectUrl) {
+    public Observable<TokenResponse> requestUserToken(String redirectUrl) {
         return Observable.just(redirectUrl)
                 .map(getAccessToken());
     }
 
-    private Func1<String, AccessToken> getAccessToken() {
-        return new Func1<String, AccessToken>() {
+    private Func1<String, TokenResponse> getAccessToken() {
+        return new Func1<String, TokenResponse>() {
             @Override
-            public AccessToken call(String redirectUrl) {
+            public TokenResponse call(String redirectUrl) {
                 Map<String, List<String>> queryParams = getQueryParams(redirectUrl);
 
                 try {
@@ -190,31 +191,4 @@ class Foo {
         }
     }
 
-    public Observable<Token> refreshToken(AccessToken accessToken) {
-        return Observable.just(accessToken).map(new Func1<AccessToken, Token>() {
-            @Override
-            public Token call(AccessToken accessToken) {
-                Log.e("!!!", " refreshing token");
-
-                try {
-                    MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
-                    Request request = new Request.Builder()
-                            .url("https://www.reddit.com/api/v1/access_token")
-                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + accessToken.getRefreshToken()))
-                            .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
-                            .build();
-
-                    Response response = new OkHttpClient().newCall(request).execute();
-
-                    String result = response.body().string();
-
-                    Log.e("!!!", result);
-
-                    return parseUserToken(result);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-    }
 }

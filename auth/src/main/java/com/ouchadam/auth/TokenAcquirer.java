@@ -1,12 +1,15 @@
 package com.ouchadam.auth;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.Activity;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
-import android.support.v4.util.Pair;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -14,66 +17,101 @@ import rx.functions.Func1;
 public class TokenAcquirer {
 
     private final Foo foo;
-    private final TokenStorage tokenStorage;
+    private final AnonTokenStorage anonTokenStorage;
 
-
-
-    private AccountManager accountManager;
+    private final AccountManager accountManager;
 
     public static TokenAcquirer newInstance(Context context) {
         UUID deviceId = UUID.randomUUID();
-        return new TokenAcquirer(new Foo(deviceId), TokenStorage.from(context));
+        return new TokenAcquirer(new Foo(deviceId), AnonTokenStorage.from(context), AccountManager.get(context));
     }
 
-    public TokenAcquirer(Foo foo, TokenStorage tokenStorage) {
+    public TokenAcquirer(Foo foo, AnonTokenStorage anonTokenStorage, AccountManager accountManager) {
         this.foo = foo;
-        this.tokenStorage = tokenStorage;
+        this.anonTokenStorage = anonTokenStorage;
+        this.accountManager = accountManager;
     }
 
-    public Observable<Token> acquireToken() {
-        AccessToken accessToken = tokenStorage.getCurrentUserToken();
+    public Observable<Token> acquireToken(String accountName) {
+        if (accountName == null) {
+            return getAnonToken();
+        } else {
+            return getUserToken(accountName);
+        }
+    }
 
-        if (accessToken.isMissing() || (accessToken.isAnon() && accessToken.hasExpired())) {
+    private Observable<Token> getAnonToken() {
+        AnonToken storedToken = anonTokenStorage.getToken();
+
+        if (storedToken == null || storedToken.hasExpired()) {
             return foo.requestAnonymousAccessToken().map(saveAnonToken());
         }
 
-        return accessToken.hasExpired() ? foo.refreshToken(accessToken) : Observable.<Token>just(accessToken);
+        return Observable.<Token>just(storedToken);
     }
 
-    public void createUserToken(Activity activity) {
-        foo.requestUserAuthentication(activity);
+    private Observable<Token> getUserToken(String accountName) {
+        return Observable.just(accountName)
+                .map(accountForName())
+                .map(tokenFromAccount());
+
     }
 
-    public Observable<AccessToken> requestNewToken(String oauthRedirect) {
-       return foo.requestUserToken(oauthRedirect).map(fetchUserName()).map(saveUserToken());
-    }
-
-    private Func1<AccessToken, Pair<AccessToken, String>> fetchUserName() {
-        return new Func1<AccessToken, Pair<AccessToken, String>>() {
+    private Func1<Account, Token> tokenFromAccount() {
+        return new Func1<Account, Token>() {
             @Override
-            public Pair<AccessToken, String> call(AccessToken accessToken) {
-                return Pair.create(accessToken, new UserFetcher().fetchUserName(accessToken));
+            public Token call(Account account) {
+                try {
+                    final String accessToken = accountManager.blockingGetAuthToken(account, "", true);
+                    return new Token() {
+                        @Override
+                        public String getAccessToken() {
+                            return accessToken;
+                        }
+                    };
+                } catch (OperationCanceledException | AuthenticatorException | IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         };
     }
 
-    private Func1<Pair<AccessToken, String>, AccessToken> saveUserToken() {
-        return new Func1<Pair<AccessToken, String>, AccessToken>() {
+    private Func1<String, Account> accountForName() {
+        return new Func1<String, Account>() {
             @Override
-            public AccessToken call(Pair<AccessToken, String> input) {
-                Log.e("!!!", " saving token");
-                tokenStorage.storeToken(input.second, input.first);
-                return input.first;
+            public Account call(String accountName) {
+                Account[] accountsByType = accountManager.getAccountsByType("");
+                for (Account account : accountsByType) {
+                    if (account.name.equals(accountName)) {
+                        return account;
+                    }
+                }
+                throw new RuntimeException("account : " + accountName + " does not exist");
             }
         };
     }
 
-    private Func1<AccessToken, Token> saveAnonToken() {
-        return new Func1<AccessToken, Token>() {
+    public Observable<AccessToken2> requestNewToken(String oauthRedirect) {
+        return foo.requestUserToken(oauthRedirect).map(fetchUserName());
+    }
+
+    private Func1<TokenResponse, AccessToken2> fetchUserName() {
+        return new Func1<TokenResponse, AccessToken2>() {
             @Override
-            public AccessToken call(AccessToken input) {
+            public AccessToken2 call(TokenResponse tokenResponse) {
+                String accountName = new UserFetcher().fetchUserName(tokenResponse);
+                long expiryTime = TimeUnit.SECONDS.toMillis(tokenResponse.getExpiry()) + System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(30);
+                return new AccessToken2(accountName, tokenResponse.getRawToken(), tokenResponse.getRefreshToken(), expiryTime);
+            }
+        };
+    }
+
+    private Func1<AnonToken, Token> saveAnonToken() {
+        return new Func1<AnonToken, Token>() {
+            @Override
+            public AnonToken call(AnonToken input) {
                 Log.e("!!!", " saving token");
-                tokenStorage.storeToken("anon", input);
+                anonTokenStorage.storeToken(input);
                 return input;
             }
         };
