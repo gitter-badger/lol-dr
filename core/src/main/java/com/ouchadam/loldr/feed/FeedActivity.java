@@ -7,6 +7,7 @@ import android.util.Log;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.Executor;
 import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
@@ -17,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class FeedActivity extends BaseActivity {
 
     private static final String EXTRA_SUBREDDIT = "subreddit";
     private static final String DEFAULT_SUBREDDIT = "askreddit";
+
+    private final Executor executor;
 
     private TokenAcquirer tokenAcquirer;
     private Presenter<PostProvider.PostSummarySource> presenter;
@@ -40,6 +41,10 @@ public class FeedActivity extends BaseActivity {
         return intent;
     }
 
+    public FeedActivity() {
+        this.executor = new Executor();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +56,7 @@ public class FeedActivity extends BaseActivity {
 
         this.subreddit = getSubreddit();
 
-        repository.subreddit(subreddit)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(presentResult());
+        executor.execute(repository.subreddit(subreddit), presentResult());
     }
 
     private String getSubreddit() {
@@ -69,10 +71,7 @@ public class FeedActivity extends BaseActivity {
 
         @Override
         public void onNextPageRequest() {
-            repository.subreddit(subreddit, afterId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(presentResult());
+            executor.execute(repository.subreddit(subreddit, afterId), presentResult());
         }
     };
 

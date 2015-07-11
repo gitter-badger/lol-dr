@@ -8,6 +8,7 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
+import com.ouchadam.loldr.Executor;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
@@ -24,6 +25,8 @@ public class PostActivity extends BaseActivity {
     private static final String EXTA_POST_ID = "postId";
     private static final String EXTRA_SUBREDDIT = "subreddit";
 
+    private final Executor executor;
+
     private TokenAcquirer tokenAcquirer;
     private Presenter<CommentProvider.CommentSource> presenter;
 
@@ -32,6 +35,10 @@ public class PostActivity extends BaseActivity {
         intent.putExtra(EXTRA_SUBREDDIT, subreddit);
         intent.putExtra(EXTA_POST_ID, postId);
         return intent;
+    }
+
+    public PostActivity() {
+        this.executor = new Executor();
     }
 
     @Override
@@ -43,10 +50,7 @@ public class PostActivity extends BaseActivity {
         String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         String postId = getIntent().getStringExtra(EXTA_POST_ID);
 
-        Repository.newInstance(provider).comments(subreddit, postId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(presentResult());
+        executor.execute(Repository.newInstance(provider).comments(subreddit, postId), presentResult());
     }
 
     private Subscriber<Data.Comments> presentResult() {
