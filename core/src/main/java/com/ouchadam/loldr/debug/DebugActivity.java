@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
-import com.ouchadam.loldr.FooToken;
+import com.ouchadam.loldr.UserTokenProvider;
 import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.feed.FeedActivity;
 
@@ -52,7 +52,7 @@ public class DebugActivity extends BaseActivity {
 
                         Log.e("!!!", "added account : " + accountName);
 
-                        FooToken.PreferenceUserProvider.newInstance(DebugActivity.this).updateCurrentUser(accountName);
+                        UserTokenProvider.PreferenceUserProvider.newInstance(DebugActivity.this).updateCurrentUser(accountName);
 
                         finish();
                     } catch (OperationCanceledException | IOException | AuthenticatorException e) {

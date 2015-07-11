@@ -8,7 +8,7 @@ import android.util.Log;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.Executor;
-import com.ouchadam.loldr.FooToken;
+import com.ouchadam.loldr.UserTokenProvider;
 import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
@@ -54,7 +54,7 @@ public class FeedActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.subreddit = getSubreddit();
-        this.repository = Repository.newInstance(FooToken.newInstance(this));
+        this.repository = Repository.newInstance(UserTokenProvider.newInstance(this));
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
         this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view), drawerListener, new SubscriptionProvider());

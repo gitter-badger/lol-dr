@@ -7,16 +7,16 @@ import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.data.TokenProvider;
 
-public class FooToken implements TokenProvider {
+public class UserTokenProvider implements TokenProvider {
 
     private final TokenAcquirer tokenAcquirer;
     private final CurrentUserProvider currentUserProvider;
 
-    public static FooToken newInstance(Context context) {
-        return new FooToken(TokenAcquirer.newInstance(context), PreferenceUserProvider.newInstance(context));
+    public static UserTokenProvider newInstance(Context context) {
+        return new UserTokenProvider(TokenAcquirer.newInstance(context), PreferenceUserProvider.newInstance(context));
     }
 
-    public FooToken(TokenAcquirer tokenAcquirer, CurrentUserProvider currentUserProvider) {
+    public UserTokenProvider(TokenAcquirer tokenAcquirer, CurrentUserProvider currentUserProvider) {
         this.tokenAcquirer = tokenAcquirer;
         this.currentUserProvider = currentUserProvider;
     }

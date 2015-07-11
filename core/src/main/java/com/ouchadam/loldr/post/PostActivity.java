@@ -7,7 +7,7 @@ import android.util.Log;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.Executor;
-import com.ouchadam.loldr.FooToken;
+import com.ouchadam.loldr.UserTokenProvider;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 
@@ -44,7 +44,7 @@ public class PostActivity extends BaseActivity {
         String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         String postId = getIntent().getStringExtra(EXTA_POST_ID);
 
-        executor.execute(Repository.newInstance(FooToken.newInstance(this)).comments(subreddit, postId), presentResult());
+        executor.execute(Repository.newInstance(UserTokenProvider.newInstance(this)).comments(subreddit, postId), presentResult());
     }
 
     private Subscriber<Data.Comments> presentResult() {
