@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -78,7 +79,7 @@ public class OAuthSignInActivity extends Activity {
         TokenAcquirer.newInstance(OAuthSignInActivity.this).requestNewToken(redirectUrl)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<AccessToken2>() {
+                .subscribe(new Subscriber<UserToken>() {
                     @Override
                     public void onCompleted() {
 
@@ -90,25 +91,25 @@ public class OAuthSignInActivity extends Activity {
                     }
 
                     @Override
-                    public void onNext(AccessToken2 accessToken) {
-                        Account account = new Account(accessToken.getAccoutName(), "accountType");
+                    public void onNext(UserToken accessToken) {
+                        Account account = new Account(accessToken.getAccoutName(), getResources().getString(R.string.account_type));
 
                         AccountManager accountManager = AccountManager.get(OAuthSignInActivity.this);
 
                         Bundle userdata = createUserData(accessToken);
-                        accountManager.addAccountExplicitly(account, accessToken.getAccessToken(), userdata);
-                        accountManager.setAuthToken(account, account.type, account.type);
+                        accountManager.addAccountExplicitly(account, accessToken.getRefreshToken(), userdata);
+                        accountManager.setAuthToken(account, account.type, accessToken.getAccessToken());
+
+                        Log.e("!!!", "finishing login with : " + account.name);
 
                         finishLogin(accessToken, account);
                     }
                 });
     }
 
-    private Bundle createUserData(AccessToken2 accessToken) {
+    private Bundle createUserData(UserToken accessToken) {
         Bundle bundle = new Bundle();
-
         bundle.putLong(Authenticator.KEY_TOKEN_EXPIRY, accessToken.getExpiryTime());
-
         return bundle;
     }
 
@@ -118,18 +119,13 @@ public class OAuthSignInActivity extends Activity {
         intent.putExtra(AccountManager.KEY_ACCOUNT_TYPE, account.type);
         intent.putExtra(AccountManager.KEY_AUTHTOKEN, token.getAccessToken());
 
-        forwardAccountAuthenticatorResult();
         setResult(RESULT_OK, intent);
+        forwardAccountAuthenticatorResult(intent);
         finish();
     }
 
-    private void forwardAccountAuthenticatorResult() {
-        Bundle result = getIntent().getExtras();
-        if (result == null) {
-            authenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED, "cancelled");
-        } else {
-            authenticatorResponse.onResult(result);
-        }
+    private void forwardAccountAuthenticatorResult(Intent intent) {
+        authenticatorResponse.onResult(intent.getExtras());
     }
 
 }

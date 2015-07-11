@@ -18,17 +18,19 @@ public class TokenAcquirer {
 
     private final Foo foo;
     private final AnonTokenStorage anonTokenStorage;
+    private final String accountType;
 
     private final AccountManager accountManager;
 
     public static TokenAcquirer newInstance(Context context) {
         UUID deviceId = UUID.randomUUID();
-        return new TokenAcquirer(new Foo(deviceId), AnonTokenStorage.from(context), AccountManager.get(context));
+        return new TokenAcquirer(new Foo(deviceId), AnonTokenStorage.from(context), context.getString(R.string.account_type), AccountManager.get(context));
     }
 
-    public TokenAcquirer(Foo foo, AnonTokenStorage anonTokenStorage, AccountManager accountManager) {
+    public TokenAcquirer(Foo foo, AnonTokenStorage anonTokenStorage, String accountType, AccountManager accountManager) {
         this.foo = foo;
         this.anonTokenStorage = anonTokenStorage;
+        this.accountType = accountType;
         this.accountManager = accountManager;
     }
 
@@ -80,7 +82,7 @@ public class TokenAcquirer {
         return new Func1<String, Account>() {
             @Override
             public Account call(String accountName) {
-                Account[] accountsByType = accountManager.getAccountsByType("");
+                Account[] accountsByType = accountManager.getAccountsByType(accountType);
                 for (Account account : accountsByType) {
                     if (account.name.equals(accountName)) {
                         return account;
@@ -91,17 +93,17 @@ public class TokenAcquirer {
         };
     }
 
-    public Observable<AccessToken2> requestNewToken(String oauthRedirect) {
+    public Observable<UserToken> requestNewToken(String oauthRedirect) {
         return foo.requestUserToken(oauthRedirect).map(fetchUserName());
     }
 
-    private Func1<TokenResponse, AccessToken2> fetchUserName() {
-        return new Func1<TokenResponse, AccessToken2>() {
+    private Func1<TokenResponse, UserToken> fetchUserName() {
+        return new Func1<TokenResponse, UserToken>() {
             @Override
-            public AccessToken2 call(TokenResponse tokenResponse) {
+            public UserToken call(TokenResponse tokenResponse) {
                 String accountName = new UserFetcher().fetchUserName(tokenResponse);
                 long expiryTime = TimeUnit.SECONDS.toMillis(tokenResponse.getExpiry()) + System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(30);
-                return new AccessToken2(accountName, tokenResponse.getRawToken(), tokenResponse.getRefreshToken(), expiryTime);
+                return new UserToken(accountName, tokenResponse.getRawToken(), tokenResponse.getRefreshToken(), expiryTime);
             }
         };
     }

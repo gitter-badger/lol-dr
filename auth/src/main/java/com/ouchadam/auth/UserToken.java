@@ -1,23 +1,17 @@
 package com.ouchadam.auth;
 
-class AccessToken2 implements Token {
-
-    static final AccessToken2 MISSING = new AccessToken2("missing", "missing", "missing", -1L);
+class UserToken implements Token {
 
     private final String accoutName;
     private final String rawToken;
     private final String refreshToken;
     private final long expiryTime;
 
-    public AccessToken2(String accoutName, String rawToken, String refreshToken, long expiryTime) {
-        this.accoutName = accoutName;
+    public UserToken(String accountName, String rawToken, String refreshToken, long expiryTime) {
+        this.accoutName = accountName;
         this.rawToken = rawToken;
         this.refreshToken = refreshToken;
         this.expiryTime = expiryTime;
-    }
-
-    public boolean isMissing() {
-        return this == MISSING;
     }
 
     public long getExpiryTime() {

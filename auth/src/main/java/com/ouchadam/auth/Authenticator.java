@@ -27,7 +27,6 @@ import rx.functions.Func1;
 public class Authenticator extends AbstractAccountAuthenticator {
 
     public static final String KEY_TOKEN_EXPIRY = "KEY_TOKEN_EXPIRY";
-    private static final String KEY_TOKEN_REFRESH = "KEY_TOKEN_REFRESH";
 
     private final Context context;
     private final AccountManager accountManager;
@@ -64,7 +63,8 @@ public class Authenticator extends AbstractAccountAuthenticator {
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options)
             throws NetworkErrorException {
-        String token = accountManager.getPassword(account);
+        String refreshToken = accountManager.getPassword(account);
+        String token = accountManager.peekAuthToken(account, authTokenType);
 
         if (tokenIsInvalid(token)) {
             return promptToLogin(response, options);
@@ -72,12 +72,12 @@ public class Authenticator extends AbstractAccountAuthenticator {
 
         if (tokenHasExpired(account)) {
             try {
-                return refreshAccount(account);
+                return refreshAccount(account, refreshToken);
             } catch (Exception e) {
                 throw new RuntimeException("we failed to refresh our token");
             }
         }
-        return reuseExistingToken(account, token);
+        return reuseExistingToken(account, refreshToken);
     }
 
     private boolean tokenIsInvalid(String token) {
@@ -89,8 +89,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
         return System.currentTimeMillis() >= tokenExpiry;
     }
 
-    private Bundle refreshAccount(Account account) throws Exception {
-        String refreshToken = accountManager.getUserData(account, KEY_TOKEN_REFRESH);
+    private Bundle refreshAccount(Account account, String refreshToken) throws Exception {
         TokenResponse refreshedToken = refreshAccount(refreshToken).toBlocking().first();
         accountManager.setPassword(account, refreshedToken.getRawToken());
         accountManager.setAuthToken(account, account.type, account.type);
@@ -159,7 +158,6 @@ public class Authenticator extends AbstractAccountAuthenticator {
     private Bundle createUserFromAccount(Account account) {
         Bundle userData = new Bundle();
         userData.putLong(KEY_TOKEN_EXPIRY, Long.parseLong(accountManager.getUserData(account, KEY_TOKEN_EXPIRY)));
-        userData.putString(KEY_TOKEN_REFRESH, accountManager.getUserData(account, KEY_TOKEN_REFRESH));
         return userData;
     }
 
