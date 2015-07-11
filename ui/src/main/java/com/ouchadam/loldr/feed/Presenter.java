@@ -1,8 +1,9 @@
 package com.ouchadam.loldr.feed;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 
 import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.SourceProvider;
@@ -14,11 +15,16 @@ final class Presenter<T extends DataSource<Ui.PostSummary>> {
     private final PostSummaryAdapter<T> adapter;
 
     static <T extends DataSource<Ui.PostSummary>> Presenter<T> onCreate(
-            Activity activity,
+            AppCompatActivity activity,
             SourceProvider<Ui.PostSummary, T> dataSource,
+            String subreddit,
             Listener listener) {
 
         activity.setContentView(R.layout.activity_feed);
+
+        activity.setSupportActionBar((Toolbar) activity.findViewById(R.id.toolbar));
+
+        activity.getSupportActionBar().setTitle(subreddit);
 
         PostSummaryAdapter<T> adapter = new PostSummaryAdapter<>(activity.getLayoutInflater(), listener, dataSource);
 
