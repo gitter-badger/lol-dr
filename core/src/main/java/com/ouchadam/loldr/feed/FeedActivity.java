@@ -2,16 +2,20 @@ package com.ouchadam.loldr.feed;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.util.Log;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.Executor;
+import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
+import com.ouchadam.loldr.drawer.DrawerPresenter;
+import com.ouchadam.loldr.drawer.SubscriptionProvider;
 import com.ouchadam.loldr.post.PostActivity;
 
 import java.util.ArrayList;
@@ -52,10 +56,46 @@ public class FeedActivity extends BaseActivity {
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
 
+        final DrawerPresenter<SubscriptionProvider.SubscriptionSource> drawerPresenter = new DrawerPresenter((NavigationView) findViewById(R.id.navigation_view));
+
         this.repository = Repository.newInstance(provider);
         this.subreddit = getSubreddit();
 
         executor.execute(repository.subreddit(subreddit), presentResult());
+        executor.execute(repository.defaultSubscriptions(), new Subscriber<Data.Subscriptions>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Data.Subscriptions subscriptions) {
+
+                List<Ui.Subscription> uiSubscriptions = new ArrayList<>();
+
+                for (final Data.Subreddit subreddit : subscriptions.getSubscribedSubreddits()) {
+                    uiSubscriptions.add(new Ui.Subscription() {
+                        @Override
+                        public String getId() {
+                            return subreddit.getId();
+                        }
+
+                        @Override
+                        public String getName() {
+                            return subreddit.getName();
+                        }
+                    });
+                }
+
+                drawerPresenter.present(new SubscriptionProvider.SubscriptionSource(uiSubscriptions));
+            }
+        });
+
     }
 
     private String getSubreddit() {
