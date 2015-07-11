@@ -9,7 +9,6 @@ import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
-import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
@@ -27,7 +26,7 @@ public class PostActivity extends BaseActivity {
     private static final String EXTRA_SUBREDDIT = "subreddit";
 
     private TokenAcquirer tokenAcquirer;
-    private Presenter presenter;
+    private Presenter<CommentProvider.CommentSource> presenter;
 
     public static Intent create(String subreddit, String postId) {
         Intent intent = new Intent(ACTION);
@@ -40,7 +39,7 @@ public class PostActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.tokenAcquirer = TokenAcquirer.newInstance();
-        this.presenter = Presenter.onCreate(this, null);
+        this.presenter = Presenter.onCreate(this, new CommentProvider(), null);
 
         String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         String postId = getIntent().getStringExtra(EXTA_POST_ID);
@@ -66,53 +65,7 @@ public class PostActivity extends BaseActivity {
             @Override
             public void onNext(Data.Comments comments) {
                 List<Data.Comment> dataPosts = comments.getComments();
-
-                presenter.present(toDataSource(dataPosts));
-            }
-        };
-    }
-
-    private DataSource<Comment> toDataSource(final List<Data.Comment> dataPosts) {
-        // TODO this will be a cursor !
-        return new DataSource<Comment>() {
-            @Override
-            public int size() {
-                return dataPosts.size();
-            }
-
-            @Override
-            public Comment get(final int position) {
-                return new Comment() {
-                    @Override
-                    public String getId() {
-                        return dataPosts.get(position).getId();
-                    }
-
-                    @Override
-                    public String getBody() {
-                        return dataPosts.get(position).getBody();
-                    }
-
-                    @Override
-                    public String getAuthor() {
-                        return dataPosts.get(position).getAuthor();
-                    }
-
-                    @Override
-                    public int getDepth() {
-                        return dataPosts.get(position).getDepth();
-                    }
-
-                    @Override
-                    public boolean isMore() {
-                        return dataPosts.get(position).isMore();
-                    }
-                };
-            }
-
-            @Override
-            public void close() {
-                dataPosts.clear(); // such a nice guy
+                presenter.present(new CommentProvider.CommentSource(dataPosts));
             }
         };
     }

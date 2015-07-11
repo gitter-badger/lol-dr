@@ -16,7 +16,9 @@ class FeedDeserializer implements JsonDeserializer<Data.Feed> {
 
     @Override
     public Data.Feed deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonArray postsJson = json.getAsJsonObject().get("data").getAsJsonObject().get("children").getAsJsonArray();
+        JsonObject dataJson = json.getAsJsonObject().get("data").getAsJsonObject();
+        String afterId = dataJson.get("after").getAsString();
+        JsonArray postsJson = dataJson.get("children").getAsJsonArray();
 
         List<Data.Post> posts = new ArrayList<>(postsJson.size());
 
@@ -35,7 +37,7 @@ class FeedDeserializer implements JsonDeserializer<Data.Feed> {
             posts.add(post);
         }
 
-        return new Feed(posts);
+        return new Feed(posts, afterId);
     }
 
     private static class Post implements Data.Post {
@@ -90,14 +92,21 @@ class FeedDeserializer implements JsonDeserializer<Data.Feed> {
     private static class Feed implements Data.Feed {
 
         private final List<Data.Post> posts;
+        private final String afterId;
 
-        private Feed(List<Data.Post> posts) {
+        private Feed(List<Data.Post> posts, String afterId) {
             this.posts = posts;
+            this.afterId = afterId;
         }
 
         @Override
         public List<Data.Post> getPosts() {
             return posts;
+        }
+
+        @Override
+        public String afterId() {
+            return afterId;
         }
     }
 }

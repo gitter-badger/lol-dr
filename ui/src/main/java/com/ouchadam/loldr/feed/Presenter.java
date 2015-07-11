@@ -4,40 +4,75 @@ import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.ouchadam.loldr.DataSource;
+import com.ouchadam.loldr.SourceProvider;
 import com.ouchadam.loldr.ui.R;
 
-import java.util.List;
+final class Presenter<T extends DataSource<PostSummary>> {
 
-final class Presenter {
+    private final PostSummaryAdapter<T> adapter;
 
-    private final RecyclerView.Adapter adapter;
-    private final Posts dataSource;
+    static <T extends DataSource<PostSummary>> Presenter<T> onCreate(
+            Activity activity,
+            SourceProvider<PostSummary, T> dataSource,
+            Listener listener) {
 
-    static Presenter onCreate(Activity activity, Listener listener) {
         activity.setContentView(R.layout.activity_feed);
 
-        Posts dataSource = Posts.newInstance();
-        RecyclerView.Adapter adapter = new PostSummaryAdapter(dataSource, activity.getLayoutInflater(), listener);
+        PostSummaryAdapter<T> adapter = new PostSummaryAdapter<>(activity.getLayoutInflater(), listener, dataSource);
 
         RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.feed_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         recyclerView.setAdapter(adapter);
 
-        return new Presenter(dataSource, adapter);
+        recyclerView.addOnScrollListener(new PagingScrollListener(listener));
+
+        return new Presenter<>(adapter);
     }
 
-    private Presenter(Posts dataSource, RecyclerView.Adapter adapter) {
-        this.dataSource = dataSource;
+    private Presenter(PostSummaryAdapter<T> adapter) {
         this.adapter = adapter;
     }
 
-    public void present(List<PostSummary> postSummaries) {
-        dataSource.set(postSummaries);
-        adapter.notifyDataSetChanged();
+    public void present(T dataSource) {
+        adapter.notifyDataSourceChanged(dataSource);
     }
 
-    public interface Listener {
+    public interface Listener extends PagingListener {
         void onPostClicked(PostSummary postSummary);
+    }
+
+    interface PagingListener {
+        void onNextPageRequest();
+    }
+
+    static class PagingScrollListener extends RecyclerView.OnScrollListener {
+
+        private final PagingListener pagingListener;
+        private int prevItemCount = 0;
+
+        PagingScrollListener(PagingListener pagingListener) {
+            this.pagingListener = pagingListener;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            RecyclerView.Adapter adapter = recyclerView.getAdapter();
+            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+            int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+            int itemCount = adapter.getItemCount();
+
+            if (prevItemCount != itemCount && lastVisibleItemPosition >= (itemCount - 1) - 15) {
+                prevItemCount = itemCount;
+                pagingListener.onNextPageRequest();
+            }
+        }
+
+    }
+
+    interface PostSourceProvider<T extends DataSource<PostSummary>> extends SourceProvider<PostSummary, T> {
+
     }
 
 }

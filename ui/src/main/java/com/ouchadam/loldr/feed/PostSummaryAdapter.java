@@ -6,17 +6,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ouchadam.loldr.DataSource;
+import com.ouchadam.loldr.SourceProvider;
 
-class PostSummaryAdapter extends RecyclerView.Adapter<PostSummaryViewHolder> {
+class PostSummaryAdapter<T extends DataSource<PostSummary>> extends RecyclerView.Adapter<PostSummaryViewHolder> {
 
     private final LayoutInflater layoutInflater;
-    private final DataSource<PostSummary> dataSource;
     private final Presenter.Listener listener;
 
-    PostSummaryAdapter(DataSource<PostSummary> dataSource, LayoutInflater layoutInflater, Presenter.Listener listener) {
-        this.dataSource = dataSource;
+    private final SourceProvider<PostSummary, T> dataSource;
+
+    PostSummaryAdapter(LayoutInflater layoutInflater, Presenter.Listener listener, SourceProvider<PostSummary, T> dataSource) {
         this.layoutInflater = layoutInflater;
         this.listener = listener;
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -44,6 +46,13 @@ class PostSummaryAdapter extends RecyclerView.Adapter<PostSummaryViewHolder> {
     @Override
     public int getItemCount() {
         return dataSource.size();
+    }
+
+    public void notifyDataSourceChanged(T dataSource) {
+        int previousSize = getItemCount();
+
+        this.dataSource.swap(dataSource);
+        notifyItemRangeInserted(previousSize, dataSource.size());
     }
 
 }

@@ -24,6 +24,8 @@ public class Data {
 
         List<Data.Post> getPosts();
 
+        String afterId();
+
     }
 
     public interface Comment {

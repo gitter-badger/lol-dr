@@ -18,7 +18,6 @@ class Posts implements DataSource<PostSummary> {
     }
 
     public void set(List<PostSummary> postSummaries) {
-        this.postSummaries.clear();
         this.postSummaries.addAll(postSummaries);
     }
 
@@ -30,11 +29,6 @@ class Posts implements DataSource<PostSummary> {
     @Override
     public PostSummary get(int position) {
         return postSummaries.get(position);
-    }
-
-    @Override
-    public void close() {
-        // do nothing for now!
     }
 
 }
