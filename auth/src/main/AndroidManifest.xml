@@ -2,10 +2,25 @@
   package="com.ouchadam.auth">
 
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+  <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+  <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
   <application>
 
-    <activity android:name=".OAuthWebViewActivity" />
+    <activity android:name=".OAuthSignInActivity" />
+
+    <service
+      android:name=".AccountService"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.accounts.AccountAuthenticator" />
+      </intent-filter>
+      <meta-data
+        android:name="android.accounts.AccountAuthenticator"
+        android:resource="@xml/authenticator" />
+    </service>
 
   </application>
 

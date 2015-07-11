@@ -1,11 +1,15 @@
 package com.ouchadam.auth;
 
-import android.app.Activity;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
-import android.support.v4.util.Pair;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -13,63 +17,103 @@ import rx.functions.Func1;
 public class TokenAcquirer {
 
     private final Foo foo;
-    private final TokenStorage tokenStorage;
+    private final AnonTokenStorage anonTokenStorage;
+    private final String accountType;
+
+    private final AccountManager accountManager;
 
     public static TokenAcquirer newInstance(Context context) {
         UUID deviceId = UUID.randomUUID();
-        return new TokenAcquirer(new Foo(deviceId), TokenStorage.from(context));
+        return new TokenAcquirer(new Foo(deviceId), AnonTokenStorage.from(context), context.getString(R.string.account_type), AccountManager.get(context));
     }
 
-    public TokenAcquirer(Foo foo, TokenStorage tokenStorage) {
+    public TokenAcquirer(Foo foo, AnonTokenStorage anonTokenStorage, String accountType, AccountManager accountManager) {
         this.foo = foo;
-        this.tokenStorage = tokenStorage;
+        this.anonTokenStorage = anonTokenStorage;
+        this.accountType = accountType;
+        this.accountManager = accountManager;
     }
 
-    public Observable<Token> acquireToken() {
-        Token token = tokenStorage.getCurrentUserToken();
+    public Observable<Token> acquireToken(String accountName) {
+        if (accountName == null) {
+            return getAnonToken();
+        } else {
+            return getUserToken(accountName);
+        }
+    }
 
-        if (token.isMissing() || (token.isAnon() && token.hasExpired())) {
+    private Observable<Token> getAnonToken() {
+        AnonToken storedToken = anonTokenStorage.getToken();
+
+        if (storedToken == null || storedToken.hasExpired()) {
             return foo.requestAnonymousAccessToken().map(saveAnonToken());
         }
 
-        return token.hasExpired() ? foo.refreshToken(token) : Observable.just(token);
+        return Observable.<Token>just(storedToken);
     }
 
-    public void createUserToken(Activity activity) {
-        foo.requestUserAuthentication(activity);
+    private Observable<Token> getUserToken(String accountName) {
+        return Observable.just(accountName)
+                .map(accountForName())
+                .map(tokenFromAccount());
+
     }
 
-    public Observable<Token> requestNewToken(String oauthRedirect) {
-       return foo.requestUserToken(oauthRedirect).map(fetchUserName()).map(saveUserToken());
-    }
-
-
-    private Func1<Token, Pair<Token, String>> fetchUserName() {
-        return new Func1<Token, Pair<Token, String>>() {
+    private Func1<Account, Token> tokenFromAccount() {
+        return new Func1<Account, Token>() {
             @Override
-            public Pair<Token, String> call(Token token) {
-                return Pair.create(token, new UserFetcher().fetchUserName(token));
+            public Token call(Account account) {
+                try {
+                    final String accessToken = accountManager.blockingGetAuthToken(account, "", true);
+                    return new Token() {
+                        @Override
+                        public String getAccessToken() {
+                            return accessToken;
+                        }
+                    };
+                } catch (OperationCanceledException | AuthenticatorException | IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         };
     }
 
-    private Func1<Pair<Token, String>, Token> saveUserToken() {
-        return new Func1<Pair<Token, String>, Token>() {
+    private Func1<String, Account> accountForName() {
+        return new Func1<String, Account>() {
             @Override
-            public Token call(Pair<Token, String> input) {
-                Log.e("!!!", " saving token");
-                tokenStorage.storeToken(input.second, input.first);
-                return input.first;
+            public Account call(String accountName) {
+                Account[] accountsByType = accountManager.getAccountsByType(accountType);
+                for (Account account : accountsByType) {
+                    if (account.name.equals(accountName)) {
+                        return account;
+                    }
+                }
+                throw new RuntimeException("account : " + accountName + " does not exist");
             }
         };
     }
 
-    private Func1<Token, Token> saveAnonToken() {
-        return new Func1<Token, Token>() {
+    public Observable<UserToken> requestNewToken(String oauthRedirect) {
+        return foo.requestUserToken(oauthRedirect).map(fetchUserName());
+    }
+
+    private Func1<TokenResponse, UserToken> fetchUserName() {
+        return new Func1<TokenResponse, UserToken>() {
             @Override
-            public Token call(Token input) {
+            public UserToken call(TokenResponse tokenResponse) {
+                String accountName = new UserFetcher().fetchUserName(tokenResponse);
+                long expiryTime = TimeUnit.SECONDS.toMillis(tokenResponse.getExpiry()) + System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(30);
+                return new UserToken(accountName, tokenResponse.getRawToken(), tokenResponse.getRefreshToken(), expiryTime);
+            }
+        };
+    }
+
+    private Func1<AnonToken, Token> saveAnonToken() {
+        return new Func1<AnonToken, Token>() {
+            @Override
+            public AnonToken call(AnonToken input) {
                 Log.e("!!!", " saving token");
-                tokenStorage.storeToken("anon", input);
+                anonTokenStorage.storeToken(input);
                 return input;
             }
         };

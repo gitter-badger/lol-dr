@@ -5,16 +5,14 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.util.Log;
 
-import com.ouchadam.auth.Token;
-import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.Executor;
+import com.ouchadam.loldr.UserTokenProvider;
 import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
-import com.ouchadam.loldr.data.TokenProvider;
 import com.ouchadam.loldr.drawer.DrawerPresenter;
 import com.ouchadam.loldr.drawer.SubscriptionProvider;
 import com.ouchadam.loldr.post.PostActivity;
@@ -33,7 +31,6 @@ public class FeedActivity extends BaseActivity {
 
     private final Executor executor;
 
-    private TokenAcquirer tokenAcquirer;
     private Presenter<PostProvider.PostSummarySource> presenter;
 
     private String afterId;
@@ -57,8 +54,7 @@ public class FeedActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.subreddit = getSubreddit();
-        this.tokenAcquirer = TokenAcquirer.newInstance(this);
-        this.repository = Repository.newInstance(tokenProvider);
+        this.repository = Repository.newInstance(UserTokenProvider.newInstance(this));
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, subreddit, listener);
         this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view), drawerListener, new SubscriptionProvider());
@@ -70,14 +66,6 @@ public class FeedActivity extends BaseActivity {
     private String getSubreddit() {
         return getIntent().hasExtra(EXTRA_SUBREDDIT) ? getIntent().getStringExtra(EXTRA_SUBREDDIT) : DEFAULT_SUBREDDIT;
     }
-
-    private TokenProvider tokenProvider = new TokenProvider() {
-        @Override
-        public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken().toBlocking().first();
-            return new TokenProvider.AccessToken(token.getRawToken());
-        }
-    };
 
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override

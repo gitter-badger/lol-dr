@@ -12,11 +12,11 @@ class UserFetcher {
 
     private static final String ENDPOINT = "https://oauth.reddit.com/";
 
-    String fetchUserName(Token token) {
+    String fetchUserName(TokenResponse tokenResponse) {
         try {
             Request request = new Request.Builder()
                     .url(ENDPOINT + "/api/v1/me")
-                    .addHeader("Authorization", "bearer " + token.getRawToken())
+                    .addHeader("Authorization", "bearer " + tokenResponse.getRawToken())
                     .get()
                     .build();
 

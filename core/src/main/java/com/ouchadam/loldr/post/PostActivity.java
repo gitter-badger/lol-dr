@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.ouchadam.auth.Token;
-import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.Executor;
+import com.ouchadam.loldr.UserTokenProvider;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
-import com.ouchadam.loldr.data.TokenProvider;
 
 import java.util.List;
 
@@ -25,7 +23,6 @@ public class PostActivity extends BaseActivity {
 
     private final Executor executor;
 
-    private TokenAcquirer tokenAcquirer;
     private Presenter<CommentProvider.CommentSource> presenter;
 
     public static Intent create(String subreddit, String postId) {
@@ -42,13 +39,12 @@ public class PostActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.tokenAcquirer = TokenAcquirer.newInstance(this);
         this.presenter = Presenter.onCreate(this, new CommentProvider(), null);
 
         String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
         String postId = getIntent().getStringExtra(EXTA_POST_ID);
 
-        executor.execute(Repository.newInstance(provider).comments(subreddit, postId), presentResult());
+        executor.execute(Repository.newInstance(UserTokenProvider.newInstance(this)).comments(subreddit, postId), presentResult());
     }
 
     private Subscriber<Data.Comments> presentResult() {
@@ -70,13 +66,5 @@ public class PostActivity extends BaseActivity {
             }
         };
     }
-
-    private TokenProvider provider = new TokenProvider() {
-        @Override
-        public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken().toBlocking().first();
-            return new TokenProvider.AccessToken(token.getRawToken());
-        }
-    };
 
 }

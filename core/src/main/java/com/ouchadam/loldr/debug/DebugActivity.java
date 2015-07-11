@@ -1,14 +1,24 @@
 package com.ouchadam.loldr.debug;
 
-import android.app.Activity;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.UserTokenProvider;
+import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.feed.FeedActivity;
+
+import java.io.IOException;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -29,12 +39,34 @@ public class DebugActivity extends BaseActivity {
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
         public void onClickUserToken() {
-            tokenAcquirer.createUserToken(DebugActivity.this);
+            // TODO use the account manager!
+
+            AccountManager.get(DebugActivity.this).addAccount(getResources().getString(R.string.account_type), null, null, null, DebugActivity.this, new AccountManagerCallback<Bundle>() {
+                @Override
+                public void run(AccountManagerFuture<Bundle> accountManagerFuture) {
+
+                    try {
+                        Bundle result = accountManagerFuture.getResult();
+
+                        String accountName = result.getString(AccountManager.KEY_ACCOUNT_NAME);
+
+                        Log.e("!!!", "added account : " + accountName);
+
+                        UserTokenProvider.PreferenceUserProvider.newInstance(DebugActivity.this).updateCurrentUser(accountName);
+
+                        finish();
+                    } catch (OperationCanceledException | IOException | AuthenticatorException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }, new Handler());
+
         }
 
         @Override
         public void onClickAnonToken() {
-            tokenAcquirer.acquireToken()
+            tokenAcquirer.acquireToken(null)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Subscriber<Token>() {
@@ -50,7 +82,7 @@ public class DebugActivity extends BaseActivity {
 
                         @Override
                         public void onNext(Token token) {
-                            Toast.makeText(DebugActivity.this, token.getRawToken(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(DebugActivity.this, token.getAccessToken(), Toast.LENGTH_LONG).show();
                         }
                     });
         }
@@ -61,14 +93,5 @@ public class DebugActivity extends BaseActivity {
             finish();
         }
     };
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
-            Toast.makeText(this, data.getStringExtra("data"), Toast.LENGTH_LONG).show();
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
 }
