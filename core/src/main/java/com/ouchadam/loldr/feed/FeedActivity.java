@@ -8,6 +8,7 @@ import android.util.Log;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.Executor;
 import com.ouchadam.loldr.R;
 import com.ouchadam.loldr.Ui;
@@ -28,6 +29,8 @@ public class FeedActivity extends BaseActivity {
     private static final String EXTRA_SUBREDDIT = "subreddit";
     private static final String DEFAULT_SUBREDDIT = "askreddit";
 
+    private static final String ACTION = BuildConfig.APPLICATION_ID + ".FEED";
+
     private final Executor executor;
 
     private TokenAcquirer tokenAcquirer;
@@ -40,8 +43,8 @@ public class FeedActivity extends BaseActivity {
     private String subreddit;
     private DrawerPresenter<SubscriptionProvider.SubscriptionSource> drawerPresenter;
 
-    public Intent create(String subreddit) {
-        Intent intent = new Intent("action");
+    public static Intent create(String subreddit) {
+        Intent intent = new Intent(ACTION);
         intent.putExtra(EXTRA_SUBREDDIT, subreddit);
         return intent;
     }
@@ -58,7 +61,7 @@ public class FeedActivity extends BaseActivity {
         this.repository = Repository.newInstance(tokenProvider);
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
-        this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view));
+        this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view), drawerListener);
 
         executor.execute(repository.subreddit(subreddit), presentResult());
         executor.execute(repository.defaultSubscriptions(), updateDrawer());
@@ -145,5 +148,12 @@ public class FeedActivity extends BaseActivity {
             }
         };
     }
+
+    private final DrawerPresenter.Listener drawerListener = new DrawerPresenter.Listener() {
+        @Override
+        public void onSubscriptionClicked(Ui.Subscription subscription) {
+            startActivity(FeedActivity.create(subscription.getName()));
+        }
+    };
 
 }

@@ -16,8 +16,6 @@ import com.ouchadam.loldr.data.TokenProvider;
 import java.util.List;
 
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class PostActivity extends BaseActivity {
 
