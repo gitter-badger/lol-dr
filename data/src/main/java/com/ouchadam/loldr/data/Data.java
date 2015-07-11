@@ -2,7 +2,11 @@ package com.ouchadam.loldr.data;
 
 import java.util.List;
 
-public class Data {
+public final class Data {
+
+    private Data() {
+        throw new IllegalAccessError("Just a holder not a real class");
+    }
 
     public interface Post {
 

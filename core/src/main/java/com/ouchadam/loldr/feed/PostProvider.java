@@ -1,6 +1,7 @@
 package com.ouchadam.loldr.feed;
 
 import com.ouchadam.loldr.DataSource;
+import com.ouchadam.loldr.Ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class PostProvider implements Presenter.PostSourceProvider<PostProvider.P
     }
 
     @Override
-    public PostSummary get(int position) {
+    public Ui.PostSummary get(int position) {
         return postSummarySource.get(position);
     }
 
@@ -24,15 +25,15 @@ public class PostProvider implements Presenter.PostSourceProvider<PostProvider.P
         return postSummarySource.size();
     }
 
-    static class PostSummarySource implements DataSource<PostSummary> {
+    static class PostSummarySource implements DataSource<Ui.PostSummary> {
 
-        private final List<PostSummary> postSummaries;
+        private final List<Ui.PostSummary> postSummaries;
 
         public PostSummarySource() {
-            this(new ArrayList<PostSummary>());
+            this(new ArrayList<Ui.PostSummary>());
         }
 
-        public PostSummarySource(List<PostSummary> postSummaries) {
+        public PostSummarySource(List<Ui.PostSummary> postSummaries) {
             this.postSummaries = postSummaries;
         }
 
@@ -42,7 +43,7 @@ public class PostProvider implements Presenter.PostSourceProvider<PostProvider.P
         }
 
         @Override
-        public PostSummary get(final int position) {
+        public Ui.PostSummary get(final int position) {
             return postSummaries.get(position);
         }
 

@@ -1,5 +1,6 @@
 package com.ouchadam.loldr.feed;
 
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.List;
 
 class MarshallerFactory {
 
-    public Marshaller<List<PostSummary>, List<Data.Post>> posts() {
+    public Marshaller<List<Ui.PostSummary>, List<Data.Post>> posts() {
        return marshallList(post());
     }
 
@@ -24,11 +25,11 @@ class MarshallerFactory {
         };
     }
 
-    private Marshaller<PostSummary, Data.Post> post() {
-        return new Marshaller<PostSummary, Data.Post>() {
+    private Marshaller<Ui.PostSummary, Data.Post> post() {
+        return new Marshaller<Ui.PostSummary, Data.Post>() {
             @Override
-            public PostSummary marshall(final Data.Post from) {
-                return new PostSummary() {
+            public Ui.PostSummary marshall(final Data.Post from) {
+                return new Ui.PostSummary() {
                     @Override
                     public String getId() {
                         return from.getId();

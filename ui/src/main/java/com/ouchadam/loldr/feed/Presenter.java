@@ -6,15 +6,16 @@ import android.support.v7.widget.RecyclerView;
 
 import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.SourceProvider;
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.ui.R;
 
-final class Presenter<T extends DataSource<PostSummary>> {
+final class Presenter<T extends DataSource<Ui.PostSummary>> {
 
     private final PostSummaryAdapter<T> adapter;
 
-    static <T extends DataSource<PostSummary>> Presenter<T> onCreate(
+    static <T extends DataSource<Ui.PostSummary>> Presenter<T> onCreate(
             Activity activity,
-            SourceProvider<PostSummary, T> dataSource,
+            SourceProvider<Ui.PostSummary, T> dataSource,
             Listener listener) {
 
         activity.setContentView(R.layout.activity_feed);
@@ -39,7 +40,7 @@ final class Presenter<T extends DataSource<PostSummary>> {
     }
 
     public interface Listener extends PagingListener {
-        void onPostClicked(PostSummary postSummary);
+        void onPostClicked(Ui.PostSummary postSummary);
     }
 
     interface PagingListener {
@@ -71,7 +72,7 @@ final class Presenter<T extends DataSource<PostSummary>> {
 
     }
 
-    interface PostSourceProvider<T extends DataSource<PostSummary>> extends SourceProvider<PostSummary, T> {
+    interface PostSourceProvider<T extends DataSource<Ui.PostSummary>> extends SourceProvider<Ui.PostSummary, T> {
 
     }
 

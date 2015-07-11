@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.ui.R;
 
 final class PostSummaryViewHolder extends RecyclerView.ViewHolder {
@@ -64,7 +65,7 @@ final class PostSummaryViewHolder extends RecyclerView.ViewHolder {
 
     public interface PostInteractionsListener {
 
-        void onClick(PostSummary postSummary);
+        void onClick(Ui.PostSummary postSummary);
 
     }
 

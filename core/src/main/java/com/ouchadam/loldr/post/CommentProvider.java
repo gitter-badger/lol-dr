@@ -1,6 +1,7 @@
 package com.ouchadam.loldr.post;
 
 import com.ouchadam.loldr.DataSource;
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class CommentProvider implements Presenter.CommentSourceProvider<CommentP
     }
 
     @Override
-    public Comment get(int position) {
+    public Ui.Comment get(int position) {
         return commentSource.get(position);
     }
 
@@ -25,7 +26,7 @@ public class CommentProvider implements Presenter.CommentSourceProvider<CommentP
         return commentSource.size();
     }
 
-    static class CommentSource implements DataSource<Comment> {
+    static class CommentSource implements DataSource<Ui.Comment> {
 
         private final List<Data.Comment> dataPosts;
 
@@ -43,8 +44,8 @@ public class CommentProvider implements Presenter.CommentSourceProvider<CommentP
         }
 
         @Override
-        public Comment get(final int position) {
-            return new Comment() {
+        public Ui.Comment get(final int position) {
+            return new Ui.Comment() {
                 @Override
                 public String getId() {
                     return dataPosts.get(position).getId();

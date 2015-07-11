@@ -7,15 +7,16 @@ import android.view.ViewGroup;
 
 import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.SourceProvider;
+import com.ouchadam.loldr.Ui;
 
-class PostSummaryAdapter<T extends DataSource<PostSummary>> extends RecyclerView.Adapter<PostSummaryViewHolder> {
+class PostSummaryAdapter<T extends DataSource<Ui.PostSummary>> extends RecyclerView.Adapter<PostSummaryViewHolder> {
 
     private final LayoutInflater layoutInflater;
     private final Presenter.Listener listener;
 
-    private final SourceProvider<PostSummary, T> dataSource;
+    private final SourceProvider<Ui.PostSummary, T> dataSource;
 
-    PostSummaryAdapter(LayoutInflater layoutInflater, Presenter.Listener listener, SourceProvider<PostSummary, T> dataSource) {
+    PostSummaryAdapter(LayoutInflater layoutInflater, Presenter.Listener listener, SourceProvider<Ui.PostSummary, T> dataSource) {
         this.layoutInflater = layoutInflater;
         this.listener = listener;
         this.dataSource = dataSource;
@@ -26,7 +27,7 @@ class PostSummaryAdapter<T extends DataSource<PostSummary>> extends RecyclerView
         return PostSummaryViewHolder.inflate(viewGroup, layoutInflater, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PostSummary postSummary = dataSource.get((Integer) view.getTag(PostSummaryViewHolder.POSITION_KEY));
+                Ui.PostSummary postSummary = dataSource.get((Integer) view.getTag(PostSummaryViewHolder.POSITION_KEY));
                 listener.onPostClicked(postSummary);
             }
         });
@@ -34,7 +35,7 @@ class PostSummaryAdapter<T extends DataSource<PostSummary>> extends RecyclerView
 
     @Override
     public void onBindViewHolder(PostSummaryViewHolder viewHolder, int position) {
-        PostSummary postSummary = dataSource.get(position);
+        Ui.PostSummary postSummary = dataSource.get(position);
 
         viewHolder.setPosition(position);
         viewHolder.setTitle(postSummary.getTitle());

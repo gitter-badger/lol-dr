@@ -6,13 +6,14 @@ import android.support.v7.widget.RecyclerView;
 
 import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.SourceProvider;
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.ui.R;
 
-public class Presenter<T extends DataSource<Comment>> {
+public class Presenter<T extends DataSource<Ui.Comment>> {
 
     private final CommentAdapter<T> adapter;
 
-    static <T extends DataSource<Comment>> Presenter<T> onCreate(Activity activity, SourceProvider<Comment, T> dataSource, Listener listener) {
+    static <T extends DataSource<Ui.Comment>> Presenter<T> onCreate(Activity activity, SourceProvider<Ui.Comment, T> dataSource, Listener listener) {
         activity.setContentView(R.layout.activity_post);
 
         CommentAdapter<T> adapter = new CommentAdapter<>(dataSource, activity.getLayoutInflater(), listener);
@@ -33,10 +34,10 @@ public class Presenter<T extends DataSource<Comment>> {
     }
 
     public interface Listener {
-        void onCommentClicked(Comment comment);
+        void onCommentClicked(Ui.Comment comment);
     }
 
-    interface CommentSourceProvider<T extends DataSource<Comment>> extends SourceProvider<Comment, T> {
+    interface CommentSourceProvider<T extends DataSource<Ui.Comment>> extends SourceProvider<Ui.Comment, T> {
 
     }
 

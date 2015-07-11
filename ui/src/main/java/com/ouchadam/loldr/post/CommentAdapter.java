@@ -7,16 +7,17 @@ import android.view.ViewGroup;
 
 import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.SourceProvider;
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.post.Presenter.Listener;
 
-class CommentAdapter<T extends DataSource<Comment>> extends RecyclerView.Adapter<CommentViewHolder> {
+class CommentAdapter<T extends DataSource<Ui.Comment>> extends RecyclerView.Adapter<CommentViewHolder> {
 
     private final LayoutInflater layoutInflater;
     private final Listener listener;
 
-    private SourceProvider<Comment, T> dataSource;
+    private SourceProvider<Ui.Comment, T> dataSource;
 
-    CommentAdapter(SourceProvider<Comment, T> dataSource, LayoutInflater layoutInflater, Listener listener) {
+    CommentAdapter(SourceProvider<Ui.Comment, T> dataSource, LayoutInflater layoutInflater, Listener listener) {
         this.dataSource = dataSource;
         this.layoutInflater = layoutInflater;
         this.listener = listener;
@@ -34,7 +35,7 @@ class CommentAdapter<T extends DataSource<Comment>> extends RecyclerView.Adapter
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Comment comment = dataSource.get((Integer) view.getTag(CommentViewHolder.POSITION_KEY));
+                Ui.Comment comment = dataSource.get((Integer) view.getTag(CommentViewHolder.POSITION_KEY));
                 listener.onCommentClicked(comment);
             }
         };
@@ -42,7 +43,7 @@ class CommentAdapter<T extends DataSource<Comment>> extends RecyclerView.Adapter
 
     @Override
     public void onBindViewHolder(CommentViewHolder viewHolder, int position) {
-        Comment comment = dataSource.get(position);
+        Ui.Comment comment = dataSource.get(position);
 
         viewHolder.setPosition(position);
         viewHolder.setDepth(comment.getDepth());

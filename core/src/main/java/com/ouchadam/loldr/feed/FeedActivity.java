@@ -7,6 +7,7 @@ import android.util.Log;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.Ui;
 import com.ouchadam.loldr.data.Data;
 import com.ouchadam.loldr.data.Repository;
 import com.ouchadam.loldr.data.TokenProvider;
@@ -62,7 +63,7 @@ public class FeedActivity extends BaseActivity {
 
     private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
-        public void onPostClicked(PostSummary postSummary) {
+        public void onPostClicked(Ui.PostSummary postSummary) {
             startActivity(PostActivity.create(postSummary.getSubreddit(), postSummary.getId()));
         }
 
@@ -92,7 +93,7 @@ public class FeedActivity extends BaseActivity {
                 FeedActivity.this.afterId = feed.afterId();
                 cachedPosts.addAll(feed.getPosts());               // TODO replace this with a cursor
 
-                List<PostSummary> summaries = new MarshallerFactory().posts().marshall(cachedPosts);
+                List<Ui.PostSummary> summaries = new MarshallerFactory().posts().marshall(cachedPosts);
 
                 presenter.present(new PostProvider.PostSummarySource(summaries));
             }
