@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
-import com.ouchadam.auth.UserTokenRequest;
 import com.ouchadam.loldr.BaseActivity;
 import com.ouchadam.loldr.BuildConfig;
 import com.ouchadam.loldr.data.Data;
@@ -38,7 +37,7 @@ public class PostActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.tokenAcquirer = TokenAcquirer.newInstance();
+        this.tokenAcquirer = TokenAcquirer.newInstance(this);
         this.presenter = Presenter.onCreate(this, new CommentProvider(), null);
 
         String subreddit = getIntent().getStringExtra(EXTRA_SUBREDDIT);
@@ -73,8 +72,8 @@ public class PostActivity extends BaseActivity {
     private TokenProvider provider = new TokenProvider() {
         @Override
         public TokenProvider.AccessToken provideAccessToken() {
-            Token token = tokenAcquirer.acquireToken(UserTokenRequest.anon()).toBlocking().first();
-            return new TokenProvider.AccessToken(token.getUrlResponse());
+            Token token = tokenAcquirer.acquireToken().toBlocking().first();
+            return new TokenProvider.AccessToken(token.getRawToken());
         }
     };
 

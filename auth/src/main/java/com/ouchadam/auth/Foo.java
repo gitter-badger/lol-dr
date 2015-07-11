@@ -43,8 +43,8 @@ class Foo {
     public void requestUserAuthentication(Activity activity) {
         String responseType = "code";
         String requestId = "RANDOM_STRING";
-        String duration = "temporary";
-        String scope = "read";
+        String duration = "permanent";
+        String scope = "read,identity";
 
         Intent intent = new Intent(activity, OAuthWebViewActivity.class);
         intent.setData(
@@ -65,7 +65,7 @@ class Foo {
                 new Observable.OnSubscribe<Token>() {
                     @Override
                     public void call(Subscriber<? super Token> subscriber) {
-                        String anonymousAccessToken;
+                        Token anonymousAccessToken;
                         try {
                             anonymousAccessToken = getAnonymousAccessToken();
                         } catch (IOException e) {
@@ -73,15 +73,14 @@ class Foo {
                             return;
                         }
 
-                        subscriber.onNext(new Token(anonymousAccessToken));
+                        subscriber.onNext(anonymousAccessToken);
                         subscriber.onCompleted();
                     }
                 }
         );
     }
 
-    private String getAnonymousAccessToken() throws IOException {
-        Log.e("!!!", "running");
+    private Token getAnonymousAccessToken() throws IOException {
         MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
         Request request = new Request.Builder()
                 .url("https://www.reddit.com/api/v1/access_token")
@@ -93,9 +92,35 @@ class Foo {
 
         String result = response.body().string();
 
+        return parseAnonToken(result);
+    }
+
+    private Token parseUserToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
-            return jsonObject.getString("access_token");
+            String rawToken = jsonObject.getString("access_token");
+
+            String refreshToken;
+            if (jsonObject.has("refresh_token")) {
+                refreshToken = jsonObject.getString("refresh_token");
+            } else {
+                refreshToken = "none!";
+            }
+
+            int expiryInSeconds = jsonObject.getInt("expires_in");
+            return new Token(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
+        } catch (JSONException e) {
+            throw new RuntimeException("failed to get token", e);
+        }
+    }
+
+    private Token parseAnonToken(String result) {
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            String rawToken = jsonObject.getString("access_token");
+            int expiryInSeconds = jsonObject.getInt("expires_in");
+
+            return Token.anon(rawToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
@@ -125,7 +150,11 @@ class Foo {
 
                     Response response = new OkHttpClient().newCall(request).execute();
 
-                    return new Token(response.body().string());
+                    String result = response.body().string();
+
+                    Log.e("!!!", result);
+
+                    return parseUserToken(result);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -161,4 +190,31 @@ class Foo {
         }
     }
 
+    public Observable<Token> refreshToken(Token token) {
+        return Observable.just(token).map(new Func1<Token, Token>() {
+            @Override
+            public Token call(Token token) {
+                Log.e("!!!", " refreshing token");
+
+                try {
+                    MediaType textMediaType = MediaType.parse("application/x-www-form-urlencoded");
+                    Request request = new Request.Builder()
+                            .url("https://www.reddit.com/api/v1/access_token")
+                            .post(RequestBody.create(textMediaType, "grant_type=refresh_token&refresh_token=" + token.getRefreshToken()))
+                            .addHeader("Authorization", Credentials.basic(CLIENT_ID, ""))
+                            .build();
+
+                    Response response = new OkHttpClient().newCall(request).execute();
+
+                    String result = response.body().string();
+
+                    Log.e("!!!", result);
+
+                    return parseUserToken(result);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 }
