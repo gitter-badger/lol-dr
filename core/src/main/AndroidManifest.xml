@@ -7,13 +7,6 @@
     android:icon="@mipmap/ic_launcher"
     android:theme="@style/AppTheme">
 
-    <activity android:name="com.ouchadam.loldr.debug.DebugActivity">
-      <intent-filter android:label="@string/label_activity_debug">
-        <action android:name="android.intent.action.MAIN" />
-        <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-    </activity>
-
     <activity
       android:name="com.ouchadam.loldr.feed.FeedActivity"
       android:label="@string/label_activity_feed" />
@@ -22,6 +15,13 @@
       <intent-filter android:label="@string/label_activity_post">
         <action android:name="${applicationId}.POST" />
         <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
+
+    <activity android:name="com.ouchadam.loldr.debug.DebugActivity">
+      <intent-filter android:label="@string/label_activity_debug">
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
 
