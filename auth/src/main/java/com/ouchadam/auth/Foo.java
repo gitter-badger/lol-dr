@@ -92,10 +92,10 @@ class Foo {
 
         String result = response.body().string();
 
-        return parseToken(result);
+        return parseAnonToken(result);
     }
 
-    private Token parseToken(String result) {
+    private Token parseUserToken(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);
             String rawToken = jsonObject.getString("access_token");
@@ -109,6 +109,18 @@ class Foo {
 
             int expiryInSeconds = jsonObject.getInt("expires_in");
             return new Token(rawToken, refreshToken, expiryInSeconds, System.currentTimeMillis());
+        } catch (JSONException e) {
+            throw new RuntimeException("failed to get token", e);
+        }
+    }
+
+    private Token parseAnonToken(String result) {
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            String rawToken = jsonObject.getString("access_token");
+            int expiryInSeconds = jsonObject.getInt("expires_in");
+
+            return Token.anon(rawToken, expiryInSeconds, System.currentTimeMillis());
         } catch (JSONException e) {
             throw new RuntimeException("failed to get token", e);
         }
@@ -142,7 +154,7 @@ class Foo {
 
                     Log.e("!!!", result);
 
-                    return parseToken(result);
+                    return parseUserToken(result);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -198,7 +210,7 @@ class Foo {
 
                     Log.e("!!!", result);
 
-                    return parseToken(result);
+                    return parseUserToken(result);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
