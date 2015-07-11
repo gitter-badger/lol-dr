@@ -3,7 +3,6 @@ package com.ouchadam.loldr.drawer;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.ouchadam.loldr.DataSource;
 import com.ouchadam.loldr.SourceProvider;
@@ -11,53 +10,59 @@ import com.ouchadam.loldr.Ui;
 
 public class DrawerPresenter<T extends DataSource<Ui.Subscription>> {
 
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_NAME = "name";
+
     private final NavigationView navigationView;
     private final Listener listener;
+    private final SourceProvider<Ui.Subscription, T> dataSource;
 
-    public DrawerPresenter(NavigationView navigationView, Listener listener) {
+    public DrawerPresenter(NavigationView navigationView, Listener listener, SourceProvider<Ui.Subscription, T> dataSource) {
         this.navigationView = navigationView;
         this.listener = listener;
+        this.dataSource = dataSource;
     }
 
     public void present(T source) {
-        for (int index = 0; index < source.size(); index++) {
+        dataSource.swap(source);
+        navigationView.getMenu().clear();
+        navigationView.setNavigationItemSelectedListener(onMenuClicked);
 
-            Ui.Subscription subscription = source.get(index);
-
-            Intent intent = new Intent();
-
-            intent.putExtra("id", subscription.getId());
-            intent.putExtra("name", subscription.getName());
-
+        for (int index = 0; index < dataSource.size(); index++) {
+            Ui.Subscription subscription = dataSource.get(index);
+            Intent intent = toIntent(subscription);
             navigationView.getMenu().add(subscription.getName()).setIntent(intent);
         }
-        navigationView.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private final NavigationView.OnNavigationItemSelectedListener onMenuClicked = new NavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(MenuItem menuItem) {
+            Intent intent = menuItem.getIntent();
+            listener.onSubscriptionClicked(fromIntent(intent));
+            return true;
+        }
+    };
+
+    private Intent toIntent(Ui.Subscription subscription) {
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_ID, subscription.getId());
+        intent.putExtra(EXTRA_NAME, subscription.getName());
+        return intent;
+    }
+
+    private Ui.Subscription fromIntent(final Intent intent) {
+        return new Ui.Subscription() {
             @Override
-            public void onClick(View view) {
-
+            public String getId() {
+                return intent.getStringExtra(EXTRA_ID);
             }
-        });
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                final Intent intent = menuItem.getIntent();
-
-                listener.onSubscriptionClicked(new Ui.Subscription() {
-                    @Override
-                    public String getId() {
-                        return intent.getStringExtra("id");
-                    }
-
-                    @Override
-                    public String getName() {
-                        return intent.getStringExtra("name");
-                    }
-                });
-
-                return true;
+            public String getName() {
+                return intent.getStringExtra(EXTRA_NAME);
             }
-        });
+        };
     }
 
     public interface Listener {

@@ -26,10 +26,10 @@ import rx.Subscriber;
 
 public class FeedActivity extends BaseActivity {
 
+    private static final String ACTION = BuildConfig.APPLICATION_ID + ".FEED";
+
     private static final String EXTRA_SUBREDDIT = "subreddit";
     private static final String DEFAULT_SUBREDDIT = "askreddit";
-
-    private static final String ACTION = BuildConfig.APPLICATION_ID + ".FEED";
 
     private final Executor executor;
 
@@ -61,7 +61,7 @@ public class FeedActivity extends BaseActivity {
         this.repository = Repository.newInstance(tokenProvider);
         PostProvider postProvider = new PostProvider();
         this.presenter = Presenter.onCreate(this, postProvider, listener);
-        this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view), drawerListener);
+        this.drawerPresenter = new DrawerPresenter<>((NavigationView) findViewById(R.id.navigation_view), drawerListener, new SubscriptionProvider());
 
         executor.execute(repository.subreddit(subreddit), presentResult());
         executor.execute(repository.defaultSubscriptions(), updateDrawer());
