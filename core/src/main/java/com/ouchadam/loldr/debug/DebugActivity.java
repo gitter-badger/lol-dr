@@ -1,4 +1,4 @@
-package com.ouchadam.loldr.main;
+package com.ouchadam.loldr.debug;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,28 +8,28 @@ import android.widget.Toast;
 import com.ouchadam.auth.Token;
 import com.ouchadam.auth.TokenAcquirer;
 import com.ouchadam.loldr.BaseActivity;
+import com.ouchadam.loldr.feed.FeedActivity;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class MainActivity extends BaseActivity {
+public class DebugActivity extends BaseActivity {
 
-    private MainActivityPresenter mainActivityPresenter;
     private TokenAcquirer tokenAcquirer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainActivityPresenter = MainActivityPresenter.onCreate(this, listener);
+        Presenter.onCreate(this, listener);
 
         tokenAcquirer = TokenAcquirer.newInstance(this);
     }
 
-    private final MainActivityPresenter.Listener listener = new MainActivityPresenter.Listener() {
+    private final Presenter.Listener listener = new Presenter.Listener() {
         @Override
         public void onClickUserToken() {
-            tokenAcquirer.createUserToken(MainActivity.this);
+            tokenAcquirer.createUserToken(DebugActivity.this);
         }
 
         @Override
@@ -50,9 +50,15 @@ public class MainActivity extends BaseActivity {
 
                         @Override
                         public void onNext(Token token) {
-                            Toast.makeText(MainActivity.this, token.getRawToken(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(DebugActivity.this, token.getRawToken(), Toast.LENGTH_LONG).show();
                         }
                     });
+        }
+
+        @Override
+        public void onClickNavigateToFeed() {
+            startActivity(new Intent(DebugActivity.this, FeedActivity.class));
+            finish();
         }
     };
 
